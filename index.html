@@ -1,19 +1,1088 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-    <head>
-        <title> Hello!</title>
-        <style>
-            h1 {
-                color: blue;
-            }
-            h2 {
-                color: orange
-            }
-        </style>
-    </head>
-    <body>
-        <h1> Welcome to my wesbite!! </h1>
-        <h2> Hello I am Sundar</h2>
-    </body>
-</html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#E7EEF1">
+<title>Say and See</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Baloo+Thambi+2:wght@500;700&display=swap">
+<style>
+/* Layout: one calm full-height stage for the child, a slim control strip on top for the parent. */
+:root{
+  --bg:#E7EEF1; --surface:#FFFFFF; --sunken:#F2F6F8; --ink:#14232C; --muted:#566974; --line:#C8D5DB;
+  --accent:#1D6C82; --accent-ink:#FFFFFF; --yes:#2E8655; --no:#BF4436; --mark:#FFB300; --mark-ink:#1A1300;
+  --font-display:'Baloo Thambi 2','Noto Sans Tamil','Nirmala UI',system-ui,sans-serif;
+  --font-body:'Atkinson Hyperlegible','Noto Sans Tamil','Nirmala UI',system-ui,sans-serif;
+  --frame-max:62dvh;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E181D; --surface:#16242B; --sunken:#1B2C34; --ink:#E4EDF1; --muted:#9AB0BA; --line:#2B3E47;
+  --accent:#62B6CC; --accent-ink:#06171D; --yes:#4DBB7E; --no:#E8705F; --mark:#FFC233; --mark-ink:#1A1300; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E181D; --surface:#16242B; --sunken:#1B2C34; --ink:#E4EDF1; --muted:#9AB0BA; --line:#2B3E47;
+  --accent:#62B6CC; --accent-ink:#06171D; --yes:#4DBB7E; --no:#E8705F; --mark:#FFC233; --mark-ink:#1A1300; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 var(--font-body);display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+
+/* ---------- parent strip ---------- */
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-block:8px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  border-bottom:1px solid var(--line);background:var(--surface)}
+.brand{font:700 1.05rem/1 var(--font-display);letter-spacing:.01em;margin-right:4px}
+.status{display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:var(--sunken);font-size:.9rem;white-space:nowrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--muted)}
+.status[data-s="listening"] .dot{background:var(--yes)}
+.status[data-s="awake"] .dot{background:var(--mark)}
+.status[data-s="thinking"] .dot{background:var(--accent)}
+.status[data-s="error"] .dot{background:var(--no)}
+.heard{flex:1 1 180px;min-width:0;color:var(--muted);font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.heard b{color:var(--ink);font-weight:700}
+.lat{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.btn.on{background:var(--no);border-color:var(--no);color:#fff}
+.btn svg{width:18px;height:18px}
+.typebar{display:flex;gap:8px;padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  background:var(--surface);border-bottom:1px solid var(--line)}
+.typebar input{flex:1;min-width:0;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--sunken)}
+
+/* ---------- child stage ---------- */
+.stage{flex:1;overflow:auto;padding-block:18px 28px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.scene{max-width:1500px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.scene-head{text-align:center}
+.scene-title{font:700 clamp(1.6rem,3.6vw,2.8rem)/1.15 var(--font-display);margin:0;text-wrap:balance}
+.scene-title-ta{font:600 clamp(1.2rem,2.6vw,2rem)/1.3 var(--font-display);margin:4px 0 0;color:var(--muted)}
+.groups{display:flex;flex-direction:column;gap:22px}
+.group{display:flex;flex-direction:column;gap:8px}
+.group-label{margin:0;text-align:center;font-size:.95rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.row{display:flex;align-items:center;justify-content:center;gap:14px}
+.panel{flex:1 1 0;min-width:0;max-width:36rem;margin:0;display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.frame{position:relative;aspect-ratio:4/3;max-height:var(--frame-max);width:100%;background:var(--surface);border-radius:16px;overflow:hidden;
+  border:1px solid var(--line);cursor:pointer}
+.frame .sym{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(3rem,9vw,7rem);line-height:1;user-select:none}
+.frame img,.frame video,.frame iframe{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border:0;opacity:0;transition:opacity .25s ease;background:var(--surface)}
+.frame img.on,.frame video.on,.frame iframe.on{opacity:1}
+.frame svg.ov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.mark-label{position:absolute;transform:translate(-50%,-50%);background:var(--mark);color:var(--mark-ink);font:700 clamp(1rem,2vw,1.4rem)/1 var(--font-display);
+  padding:8px 14px 6px;border-radius:999px;box-shadow:0 1px 0 rgba(0,0,0,.25);pointer-events:none;white-space:nowrap}
+.badge{position:absolute;top:10px;right:10px;width:clamp(40px,5vw,60px);height:clamp(40px,5vw,60px);border-radius:50%;display:grid;place-items:center;color:#fff;
+  box-shadow:0 0 0 4px var(--surface)}
+.badge.yes{background:var(--yes)} .badge.no{background:var(--no)}
+.badge svg{width:60%;height:60%}
+.cap{text-align:center;font:700 clamp(1.15rem,2.2vw,1.8rem)/1.15 var(--font-display)}
+.cap-ta{text-align:center;font:600 clamp(1rem,1.9vw,1.5rem)/1.25 var(--font-display);color:var(--muted)}
+.sep{flex:none;display:grid;place-items:center;color:var(--muted)}
+.sep svg{width:clamp(28px,3vw,44px);height:clamp(28px,3vw,44px)}
+.sep.vs{width:2px;align-self:stretch;background:var(--line);margin-block:24px}
+.panel .yt{font-size:.85rem;text-align:center}
+.panel .yt a{color:var(--accent)}
+.stepper{display:flex;justify-content:center;gap:12px;align-items:center;font-variant-numeric:tabular-nums;color:var(--muted)}
+
+/* welcome */
+.welcome{max-width:62rem;margin:0 auto;display:grid;gap:22px}
+.welcome h1{font:700 clamp(1.8rem,4vw,3rem)/1.1 var(--font-display);margin:0;text-wrap:balance}
+.welcome h1 em{font-style:normal;color:var(--accent)}
+.lede{margin:0;color:var(--muted);max-width:60ch}
+.examples{display:flex;flex-wrap:wrap;gap:10px}
+.examples .btn{white-space:normal;text-align:left;padding:10px 14px}
+.checklist{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.checklist li{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.checklist .ok,.checklist .todo{white-space:nowrap;min-width:3.2em}
+.checklist .ok{color:var(--yes);font-weight:700}
+.checklist .todo{color:var(--no);font-weight:700}
+.cmds{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0}
+.cmds dt{font-weight:700;white-space:nowrap}
+.cmds dd{margin:0;color:var(--muted)}
+
+/* settings */
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);padding:0;width:min(640px,calc(100vw - 32px));max-height:calc(100dvh - 32px)}
+dialog::backdrop{background:rgba(5,15,20,.45)}
+.dlg{display:flex;flex-direction:column;max-height:calc(100dvh - 34px)}
+.dlg header,.dlg footer{padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+.dlg footer{border-bottom:0;border-top:1px solid var(--line);justify-content:flex-end}
+.dlg header h2{margin:0;font:700 1.25rem var(--font-display);flex:1}
+.dlg .body{overflow:auto;padding:16px 18px;display:grid;gap:16px}
+fieldset{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:10px;margin:0}
+legend{font-weight:700;padding:0 6px}
+.f{display:grid;gap:4px}
+.f label{font-weight:700;font-size:.92rem}
+.f small{color:var(--muted)}
+.f input[type=text],.f input[type=password],.f select,.f textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--sunken)}
+.f textarea{min-height:120px;resize:vertical}
+.chk{display:flex;gap:10px;align-items:flex-start}
+.chk input{margin-top:4px;width:18px;height:18px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.prog{font-size:.9rem;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* guide */
+.lang-tabs{display:flex;gap:6px}
+.lang-tabs .btn[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.guide{display:grid;gap:12px;line-height:1.55}
+.guide h3{font:700 1.15rem/1.25 var(--font-display);margin:10px 0 0}
+.guide p{margin:0}
+.guide ol,.guide ul{margin:0;padding-left:1.4em;display:grid;gap:6px}
+.guide .tw{overflow-x:auto}
+.guide table{border-collapse:collapse;width:100%;font-size:.95rem}
+.guide th,.guide td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+.guide th{background:var(--sunken)}
+.guide .note{background:var(--sunken);border-radius:10px;padding:10px 12px}
+/* log */
+.log{position:fixed;left:0;right:0;bottom:0;max-height:42dvh;overflow:auto;background:var(--surface);border-top:2px solid var(--accent);z-index:20;
+  padding-block:8px calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  font:13px/1.45 ui-monospace,Consolas,Menlo,monospace}
+.log-head{display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:var(--font-body);margin-bottom:6px}
+.log ol{list-style:none;margin:0;padding:0;display:grid;gap:3px}
+.log li{white-space:pre-wrap;word-break:break-word}
+.log li.err{color:var(--no)} .log li.ok{color:var(--yes)}
+.log time{color:var(--muted);margin-right:8px}
+.status{cursor:pointer;border:0;color:inherit}
+.prog{white-space:pre-line}
+@media (max-width:640px){
+  .row{flex-direction:column;align-items:stretch}
+  .panel{max-width:none}
+  .frame{max-height:none}
+  .sep svg{transform:rotate(90deg)}
+  .sep.vs{width:auto;height:2px;margin:0 24px}
+  .heard{order:9;flex-basis:100%}
+  .two{grid-template-columns:1fr}
+  .brand{display:none}
+}
+@media (prefers-reduced-motion:reduce){.frame img,.frame video,.frame iframe{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="brand">Say and See</span>
+  <button class="status" id="status" type="button" data-s="off" title="Show what happened"><span class="dot"></span><span id="statusText">Not listening</span></button>
+  <span class="heard" id="heard">Press <b>Start listening</b>, then say your wake word and a sentence.</span>
+  <span class="lat" id="lat"></span>
+  <button class="btn primary" id="micBtn" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+    <span id="micLabel">Start listening</span></button>
+  <button class="btn" id="talkBtn" type="button" title="Skip the wake word for the next sentence">Talk now</button>
+  <button class="btn" id="typeBtn" type="button" title="Type a sentence instead">Type</button>
+  <button class="btn" id="clearBtn" type="button" title="Blank screen">Clear</button>
+  <button class="btn" id="logBtn" type="button" title="Show what happened, step by step">Log</button>
+  <button class="btn" id="guideBtn" type="button" title="How to use this app">Guide</button>
+  <button class="btn" id="fsBtn" type="button" title="Full screen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+  <button class="btn" id="setBtn" type="button" title="Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+</div>
+
+<form class="typebar" id="typebar" hidden>
+  <input id="typeInput" type="text" placeholder="Type a sentence, e.g. Fish live in water" autocomplete="off">
+  <button class="btn primary" type="submit">Show</button>
+</form>
+
+<aside class="log" id="logBox" hidden aria-label="Log">
+  <div class="log-head"><b>What happened (newest first)</b><span><button class="btn" type="button" id="logCopy">Copy</button> <button class="btn" type="button" id="logClose">Close</button></span></div>
+  <ol id="logList"></ol>
+</aside>
+
+<main class="stage" id="stage">
+  <section class="welcome" id="welcome">
+    <h1>Say <em id="wakeShow">“Buddy”</em>, then your sentence.</h1>
+    <p><button class="btn primary" type="button" id="guideBtn2">Read the guide · வழிகாட்டி</button></p>
+    <p class="lede">The screen turns the sentence into pictures: comparisons side by side, causes and effects in order, and an arrow on the part you name. Anything you say without the wake word is ignored.</p>
+    <div>
+      <p class="group-label" style="text-align:left;margin-bottom:8px">Try one</p>
+      <div class="examples" id="examples"></div>
+    </div>
+    <ul class="checklist" id="checklist"></ul>
+    <dl class="cmds" id="cmds"></dl>
+  </section>
+  <div id="sceneHost"></div>
+</main>
+
+<dialog id="settings">
+  <form class="dlg" method="dialog" id="setForm">
+    <header><h2>Settings</h2><button class="btn" type="button" id="closeBtn">Close</button></header>
+    <div class="body">
+      <fieldset>
+        <legend>AI that plans the pictures</legend>
+        <div class="f"><label for="s-provider">Provider</label>
+          <select id="s-provider"><option value="gemini">Google Gemini</option><option value="claude">Anthropic Claude</option></select>
+          <small>Both work. Gemini has a free tier. Keys stay in this browser on this device only.</small></div>
+        <div class="two">
+          <div class="f"><label for="s-gkey">Gemini API key</label><input id="s-gkey" type="password" autocomplete="off"></div>
+          <div class="f"><label for="s-gmodel">Gemini model</label><input id="s-gmodel" type="text" autocomplete="off"></div>
+          <div class="f"><label for="s-ckey">Claude API key</label><input id="s-ckey" type="password" autocomplete="off"></div>
+          <div class="f"><label for="s-cmodel">Claude model</label><input id="s-cmodel" type="text" autocomplete="off"></div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Listening</legend>
+        <div class="two">
+          <div class="f"><label for="s-wake">Wake words</label><input id="s-wake" type="text" autocomplete="off">
+            <small>Comma separated. Add the Tamil spelling too if you listen in Tamil.</small></div>
+          <div class="f"><label for="s-lang">I speak in</label>
+            <select id="s-lang"><option value="en-IN">English (India)</option><option value="en-GB">English (UK)</option><option value="en-US">English (US)</option><option value="ta-IN">தமிழ் Tamil</option></select></div>
+        </div>
+        <label class="chk"><input id="s-early" type="checkbox"><span>Start as soon as I pause (faster, may run twice on long sentences)</span></label>
+      </fieldset>
+      <fieldset>
+        <legend>Pictures</legend>
+        <div class="f"><label for="s-caption">Words under pictures</label>
+          <select id="s-caption"><option value="en">English</option><option value="ta">Tamil</option><option value="both">English and Tamil</option></select></div>
+        <div class="two">
+          <div class="f"><label for="s-pixabay">Pixabay key (recommended)</label><input id="s-pixabay" type="password" autocomplete="off">
+            <small>Free. Better photos and cartoons, safe search on.</small></div>
+          <div class="f"><label for="s-youtube">YouTube key (for videos)</label><input id="s-youtube" type="password" autocomplete="off">
+            <small>Optional. Strict safe search.</small></div>
+        </div>
+        <label class="chk"><input id="s-marks" type="checkbox"><span>Point at the part I name (branch, root, beak…)</span></label>
+        <label class="chk"><input id="s-step" type="checkbox"><span>One group at a time (say “next” to move on)</span></label>
+      </fieldset>
+      <fieldset>
+        <legend>Prepare a lesson</legend>
+        <div class="f"><label for="s-lesson">One sentence per line</label>
+          <textarea id="s-lesson" placeholder="Coconut trees don't have branches&#10;Smoke, dust and germs pollute the air&#10;Fish live in water"></textarea>
+          <small>Builds and saves the pictures now, so they appear instantly when you say these sentences. Tap any picture during a lesson to swap it; your choice is kept.</small></div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button class="btn primary" type="button" id="prepBtn">Prepare these</button>
+          <button class="btn" type="button" id="testBtn">Test my setup</button>
+          <button class="btn" type="button" id="wipeBtn">Forget saved pictures</button>
+          <span class="prog" id="prog"></span>
+        </div>
+      </fieldset>
+    </div>
+    <footer><button class="btn primary" value="save" type="submit" id="saveBtn">Save</button></footer>
+  </form>
+</dialog>
+
+<dialog id="guide" aria-labelledby="guideTitle">
+  <div class="dlg">
+    <header><h2 id="guideTitle">Parent guide</h2>
+      <div class="lang-tabs" role="tablist">
+        <button class="btn" type="button" role="tab" id="gEnTab" aria-selected="true">English</button>
+        <button class="btn" type="button" role="tab" id="gTaTab" aria-selected="false">தமிழ்</button>
+      </div>
+      <button class="btn" type="button" id="guideClose">Close</button></header>
+    <div class="body">
+      <section class="guide" id="gEn">
+<h3>What it does</h3>
+<p>Say and See shows pictures while you teach. Say the wake word <b>buddy</b>, then a sentence: <i>“Buddy, coconut trees don't have branches.”</i> The screen shows a coconut tree and a tree with branches side by side, and points to the branch.</p>
+<p>Anything you say without “buddy” is ignored. It works in Chrome or Edge on a computer or Android tablet, and in Safari on iPhone. You need an internet connection.</p>
+<h3>Set it up once (about 10 minutes)</h3>
+<ol>
+<li><b>Open the app link</b> you were sent, in Chrome (computer or Android) or Safari (iPhone).</li>
+<li><b>Get a free Gemini key.</b> Go to aistudio.google.com, sign in with your Google account, and click <b>Get API key</b>. Copy the long key it shows.</li>
+<li><b>Paste the key.</b> In the app, tap the <b>gear icon</b> (top right). Paste the key into <b>Gemini API key</b> and tap <b>Save</b>.</li>
+<li><b>Optional: better photos.</b> Make a free account at pixabay.com, open pixabay.com/api/docs, copy your key, and paste it into <b>Pixabay key</b> in Settings.</li>
+<li><b>Check it works.</b> In Settings, tap <b>Test my setup</b>. Every line should say OK.</li>
+</ol>
+<p class="note">Your keys stay on your own phone or computer. Do this once on each device you use. Never share your key with anyone.</p>
+<h3>Using it while teaching</h3>
+<p>Tap <b>Start listening</b> and allow the microphone. Then speak normally to your child, and say “buddy” only when you want pictures.</p>
+<div class="tw"><table>
+<tr><th>Say this</th><th>What happens</th></tr>
+<tr><td>Buddy, fish live in water</td><td>Pictures for the sentence</td></tr>
+<tr><td>Buddy … (pause) … fish live in water</td><td>Same, in two breaths</td></tr>
+<tr><td>Buddy, clear</td><td>Blank screen</td></tr>
+<tr><td>Buddy, next / Buddy, back</td><td>Move between picture groups (one-at-a-time mode)</td></tr>
+<tr><td>Buddy, again</td><td>New pictures for the last sentence</td></tr>
+</table></div>
+<ul>
+<li><b>Tap a picture</b> to change it. The app remembers your choice, so your child sees the same picture next time.</li>
+<li><b>Talk now</b> button: the next sentence works without saying “buddy”.</li>
+<li><b>Type</b> button: type a sentence instead of speaking.</li>
+<li><b>Prepare a lesson</b> (in Settings): type tomorrow's sentences, one per line, and tap <b>Prepare these</b>. The pictures then appear instantly during the lesson.</li>
+<li><b>Tamil:</b> in Settings, set <b>I speak in</b> to Tamil and <b>Words under pictures</b> to Tamil or both. Add பட்டி to the wake words.</li>
+<li>A clip-on microphone works much better than the phone's own microphone across a room.</li>
+</ul>
+<h3>If pictures don't appear</h3>
+<ul>
+<li><b>Top bar says “Ignored, no wake word”</b>: the app did not hear “buddy”. Say it clearly, or tap <b>Talk now</b> first.</li>
+<li><b>Status turns red</b>: tap it to open the <b>Log</b>. It says what went wrong, such as a wrong key.</li>
+<li><b>Nothing happens at all</b>: open Settings and tap <b>Test my setup</b>. Fix any line that is not OK.</li>
+<li><b>On iPhone it stops listening</b>: this is normal for iPhone. Tap <b>Talk now</b> before each sentence.</li>
+<li><b>Still stuck</b>: tap <b>Log</b>, then <b>Copy</b>, and send the text to the person who shared the app.</li>
+</ul>
+      </section>
+      <section class="guide" id="gTa" lang="ta" hidden>
+<h3>இது என்ன செய்யும்</h3>
+<p>நீங்கள் பாடம் சொல்லும்போது இந்த செயலி படங்களைக் காட்டும். முதலில் <b>buddy</b> என்று சொல்லுங்கள், பிறகு வாக்கியத்தைச் சொல்லுங்கள். உதாரணம்: <i>“Buddy, coconut trees don't have branches.”</i> திரையில் தென்னை மரமும், கிளைகள் உள்ள மரமும் அருகருகே வரும். கிளையை ஒரு குறி காட்டும்.</p>
+<p>“buddy” சொல்லாமல் பேசுவதை செயலி எடுத்துக்கொள்ளாது. இணைய இணைப்பு தேவை.</p>
+<h3>ஒருமுறை அமைக்க (சுமார் 10 நிமிடம்)</h3>
+<ol>
+<li>உங்களுக்கு அனுப்பிய செயலி <b>link</b>-ஐ Chrome-இல் (கணினி அல்லது Android) அல்லது Safari-இல் (iPhone) திறக்கவும்.</li>
+<li><b>இலவச Gemini key பெறுங்கள்.</b> aistudio.google.com-க்குச் சென்று, உங்கள் Google கணக்கில் நுழைந்து, <b>Get API key</b> அழுத்துங்கள். வரும் நீண்ட key-ஐ copy செய்யுங்கள்.</li>
+<li>செயலியில் மேலே வலது பக்கம் உள்ள <b>சக்கரக் குறியை</b> (gear) அழுத்துங்கள். <b>Gemini API key</b> பெட்டியில் key-ஐ paste செய்து <b>Save</b> அழுத்துங்கள்.</li>
+<li><b>விருப்பம், நல்ல புகைப்படங்களுக்கு:</b> pixabay.com-இல் இலவசக் கணக்கு தொடங்குங்கள். pixabay.com/api/docs பக்கத்தில் உள்ள key-ஐ <b>Pixabay key</b> பெட்டியில் paste செய்யுங்கள்.</li>
+<li>Settings-இல் <b>Test my setup</b> அழுத்துங்கள். எல்லா வரிகளிலும் OK வர வேண்டும்.</li>
+</ol>
+<p class="note">உங்கள் key உங்கள் கைபேசி அல்லது கணினியில் மட்டுமே இருக்கும். ஒவ்வொரு கருவியிலும் ஒருமுறை இதைச் செய்யுங்கள். உங்கள் key-ஐ யாருடனும் பகிர வேண்டாம்.</p>
+<h3>பாடம் சொல்லும்போது</h3>
+<p><b>Start listening</b> அழுத்தி, மைக்கை அனுமதியுங்கள். குழந்தையிடம் வழக்கம் போலப் பேசுங்கள். படம் வேண்டும்போது மட்டும் “buddy” சொல்லுங்கள்.</p>
+<div class="tw"><table>
+<tr><th>சொல்லுங்கள்</th><th>நடப்பது</th></tr>
+<tr><td>Buddy, fish live in water</td><td>வாக்கியத்துக்கான படங்கள் வரும்</td></tr>
+<tr><td>Buddy … (நிறுத்தி) … fish live in water</td><td>அதுவே, இரண்டு மூச்சில்</td></tr>
+<tr><td>Buddy, clear</td><td>திரை காலியாகும்</td></tr>
+<tr><td>Buddy, next / Buddy, back</td><td>அடுத்த / முந்தைய படக் குழு</td></tr>
+<tr><td>Buddy, again</td><td>கடைசி வாக்கியத்துக்குப் புதிய படங்கள்</td></tr>
+</table></div>
+<ul>
+<li><b>படத்தைத் தொட்டால்</b> வேறு படம் வரும். நீங்கள் தேர்ந்த படத்தை செயலி நினைவில் வைக்கும். அடுத்த முறையும் குழந்தைக்கு அதே படம் வரும்.</li>
+<li><b>Talk now</b>: அடுத்த வாக்கியத்துக்கு “buddy” சொல்லத் தேவையில்லை.</li>
+<li><b>Type</b>: பேசாமல் வாக்கியத்தை எழுதலாம்.</li>
+<li><b>Prepare a lesson</b> (Settings-இல்): நாளைய வாக்கியங்களை வரிக்கு ஒன்றாக எழுதி <b>Prepare these</b> அழுத்துங்கள். பாடத்தின்போது படங்கள் உடனே வரும்.</li>
+<li><b>தமிழில் பேச:</b> Settings-இல் <b>I speak in</b> என்பதை Tamil ஆக்குங்கள். Wake words பெட்டியில் பட்டி என்று சேர்க்கவும். படங்களின் கீழே தமிழ் வேண்டுமானால் <b>Words under pictures</b> என்பதை Tamil ஆக்குங்கள்.</li>
+<li>அறையில் தூரத்திலிருந்து பேசும்போது, சட்டையில் மாட்டும் சிறிய மைக் நன்றாக வேலை செய்யும்.</li>
+</ul>
+<h3>படம் வரவில்லை என்றால்</h3>
+<ul>
+<li><b>மேலே “Ignored, no wake word” என்று வந்தால்:</b> “buddy” சரியாகக் கேட்கவில்லை. தெளிவாகச் சொல்லுங்கள், அல்லது முதலில் <b>Talk now</b> அழுத்துங்கள்.</li>
+<li><b>நிலைக்குறி சிவப்பானால்:</b> அதைத் தொட்டு <b>Log</b> பாருங்கள். என்ன தவறு என்று அது சொல்லும்.</li>
+<li><b>எதுவுமே நடக்கவில்லை என்றால்:</b> Settings-இல் <b>Test my setup</b> அழுத்தி, OK இல்லாத வரியைச் சரிசெய்யுங்கள்.</li>
+<li><b>iPhone-இல் கேட்பது நின்றால்:</b> இது iPhone-இல் வழக்கம். ஒவ்வொரு வாக்கியத்துக்கும் முன் <b>Talk now</b> அழுத்துங்கள்.</li>
+<li><b>இன்னும் சரியாகவில்லை என்றால்:</b> <b>Log</b>, பிறகு <b>Copy</b> அழுத்தி, செயலியை அனுப்பியவருக்கு அனுப்புங்கள்.</li>
+</ul>
+      </section>
+    </div>
+  </div>
+</dialog>
+
+<script>
+"use strict";
+/* ======================= settings ======================= */
+const DEFAULTS = {
+  provider:'gemini', gkey:'', gmodel:'gemini-3.6-flash', ckey:'', cmodel:'claude-haiku-5-5',
+  wake:'buddy', lang:'en-IN', early:true, caption:'en', pixabay:'', youtube:'', marks:true, step:false, lesson:''
+};
+const S = Object.assign({}, DEFAULTS, load('sas.settings', {}));
+function load(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch{ return d; } }
+function store(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} }
+const $ = id => document.getElementById(id);
+const apiKey = () => S.provider === 'claude' ? S.ckey : S.gkey;
+const providerName = () => S.provider === 'claude' ? 'Claude' : 'Gemini';
+const modelName = () => S.provider === 'claude' ? S.cmodel : S.gmodel;
+
+/* ======================= planner prompt ======================= */
+const PLANNER = `You plan pictures for a teaching screen. A parent is teaching a young autistic child who learns visually. The parent says one sentence (English or Tamil). You choose a few pictures that make the meaning obvious at a glance.
+
+OUTPUT: JSON Lines only. One JSON object per line. No prose, no markdown, no code fences. The screen draws each line the moment it arrives, so write the most important picture first and keep lines short.
+
+Line types:
+{"t":"scene","title":"<the idea in at most 7 simple English words>","title_ta":"<same idea in simple Tamil script>"}
+{"t":"group","layout":"compare|sequence|grid|single","label":"<2-5 words or empty>","label_ta":"<Tamil or empty>"}
+{"t":"panel","kind":"photo|illustration|video|symbol","wiki":"<exact English Wikipedia title or empty>","query":"<2-5 word English image search>","caption":"<1-3 English words>","caption_ta":"<Tamil>","badge":"yes|no|","mark":"<visible part to point at, or empty>","symbol":"<1-3 emoji showing the same thing>"}
+
+RULES
+- Line 1 is the scene line. Then 1 to 3 groups, each followed by its panels. At most 8 panels in total. Fewer is better when the sentence is simple.
+- compare: exactly 2 panels that contrast (the thing and an opposite or different thing). badge "yes" on the panel that has the property the sentence talks about, "no" on the one that lacks it. Use compare whenever the sentence says "not", "don't", "no", "without", "unlike", or describes a property that is easier to see next to its opposite.
+- sequence: 2 to 4 panels in cause-and-effect or time order.
+- grid: 2 to 4 examples of the same kind of thing. single: 1 panel.
+- kind: photo for real, visible things; illustration for invisible or abstract things (germs, air, feelings, sickness) and for people doing actions; video only when the idea is a motion or process the child must see happen (a seed sprouting, a butterfly hatching, rain falling); symbol only if no picture would be clearer.
+- wiki: only for an animal, plant species, food, object or place whose Wikipedia lead image is a clear photo of it (e.g. "Elephant", "Nelumbo nucifera", "Volcano"). Otherwise "".
+- query: concrete, visual, child-safe search words. For illustration include the word "cartoon". Do not include words like "picture of".
+- mark: when the sentence names a part (branch, leaf, root, trunk, stem, petal, beak, fin, wing, tail, wheel), set mark to that part on the panel where it is clearly visible, so the screen can point at it.
+- Captions use words a 5-year-old knows. Tamil in Tamil script, simple spoken Tamil.
+- Always fill symbol; it is shown while the photo loads.
+- Never show anything scary, violent, gory or medical. Sick means a child resting in bed or coughing, never a hospital, needle or blood.
+
+EXAMPLE
+Sentence: Coconut trees don't have branches
+{"t":"scene","title":"Coconut tree has no branches","title_ta":"தென்னை மரத்தில் கிளைகள் இல்லை"}
+{"t":"group","layout":"compare","label":"No branches, branches","label_ta":"கிளை இல்லை, கிளை உண்டு"}
+{"t":"panel","kind":"photo","wiki":"","query":"coconut palm tree","caption":"Coconut tree","caption_ta":"தென்னை மரம்","badge":"no","mark":"","symbol":"🌴"}
+{"t":"panel","kind":"photo","wiki":"","query":"mango tree branches","caption":"Mango tree","caption_ta":"மாமரம்","badge":"yes","mark":"branch","symbol":"🌳"}
+
+EXAMPLE
+Sentence: Smoke, dust and germs pollute the air
+{"t":"scene","title":"Smoke, dust and germs make air dirty","title_ta":"புகை, தூசி, கிருமிகள் காற்றை அசுத்தமாக்கும்"}
+{"t":"group","layout":"grid","label":"These make air dirty","label_ta":"இவை காற்றை அசுத்தமாக்கும்"}
+{"t":"panel","kind":"photo","wiki":"","query":"factory chimney smoke","caption":"Smoke","caption_ta":"புகை","badge":"","mark":"","symbol":"🏭💨"}
+{"t":"panel","kind":"photo","wiki":"","query":"dust cloud dirt road","caption":"Dust","caption_ta":"தூசி","badge":"","mark":"","symbol":"🌫️"}
+{"t":"panel","kind":"illustration","wiki":"","query":"germs bacteria cartoon","caption":"Germs","caption_ta":"கிருமிகள்","badge":"","mark":"","symbol":"🦠"}
+{"t":"group","layout":"compare","label":"Clean air, dirty air","label_ta":"சுத்தமான காற்று, அசுத்தமான காற்று"}
+{"t":"panel","kind":"photo","wiki":"","query":"clean air blue sky park","caption":"Clean air","caption_ta":"சுத்தமான காற்று","badge":"yes","mark":"","symbol":"🌳☀️"}
+{"t":"panel","kind":"photo","wiki":"","query":"smog air pollution city","caption":"Dirty air","caption_ta":"அசுத்தமான காற்று","badge":"no","mark":"","symbol":"🏭🌫️"}
+{"t":"group","layout":"sequence","label":"Dirty air makes us sick","label_ta":"அசுத்தமான காற்று நோய் தரும்"}
+{"t":"panel","kind":"illustration","wiki":"","query":"boy breathing smoke cartoon","caption":"Breathes dirty air","caption_ta":"அசுத்த காற்றை சுவாசிக்கிறான்","badge":"","mark":"","symbol":"👦🌫️"}
+{"t":"panel","kind":"illustration","wiki":"","query":"boy coughing cartoon","caption":"Coughs","caption_ta":"இருமுகிறான்","badge":"","mark":"","symbol":"😷"}
+{"t":"panel","kind":"illustration","wiki":"","query":"sick child resting in bed cartoon","caption":"Feels sick","caption_ta":"உடம்பு சரியில்லை","badge":"","mark":"","symbol":"🤒🛏️"}`;
+
+/* ======================= small utils ======================= */
+const enc = encodeURIComponent;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function norm(s){ return (s||'').toLowerCase().replace(/n['’]t\b/g, ' not').replace(/[^\p{L}\p{M}\p{N}\s]/gu,' ').replace(/\s+/g,' ').trim(); }
+function tokens(s){ return new Set(norm(s).split(' ').filter(w => w.length > 1)); }
+function jaccard(a, b){ const A = tokens(a), B = tokens(b); if(!A.size || !B.size) return 0; let n = 0; A.forEach(w => { if(B.has(w)) n++; }); return n / (A.size + B.size - n); }
+function el(tag, cls, text){ const e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
+async function getJSON(url, signal, opts={}){ const r = await fetch(url, Object.assign({signal}, opts)); if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }
+function withTimeout(p, ms){ return Promise.race([p, sleep(ms).then(() => { throw new Error('timeout'); })]); }
+
+function log(msg, kind){
+  try{
+    const ol = $('logList'); const li = el('li', kind || '');
+    li.append(el('time', null, new Date().toLocaleTimeString([], {hour12:false})), document.createTextNode(msg));
+    ol.prepend(li); while(ol.children.length > 120) ol.lastChild.remove();
+  }catch{}
+}
+function lev1(a, b){
+  if(a === b) return true; const la = a.length, lb = b.length; if(Math.abs(la - lb) > 1) return false;
+  let i = 0, j = 0, d = 0;
+  while(i < la && j < lb){ if(a[i] === b[j]){ i++; j++; continue; } if(++d > 1) return false; if(la > lb) i++; else if(lb > la) j++; else { i++; j++; } }
+  return d + (la - i) + (lb - j) <= 1;
+}
+
+/* Streaming JSON object extractor. Pulls out every top-level {...} as soon as it closes,
+   whether the model wrote one per line, pretty-printed them, wrapped them in an array or a code fence.
+   One big object with "groups" is unpacked into scene/group/panel events. */
+function jsonLines(onObj){
+  let buf = '', i = 0, depth = 0, inStr = false, esc = false, start = -1;
+  const emit = obj => {
+    if(!obj || typeof obj !== 'object') return;
+    if(obj.t){ onObj(obj); return; }
+    if(Array.isArray(obj.groups)){
+      onObj({t:'scene', title:obj.title || '', title_ta:obj.title_ta || ''});
+      obj.groups.forEach(g => { onObj(Object.assign({}, g, {t:'group'})); (g.panels || []).forEach(p => onObj(Object.assign({}, p, {t:'panel'}))); });
+      return;
+    }
+    if(Array.isArray(obj.panels)){ onObj(Object.assign({}, obj, {t:'group'})); obj.panels.forEach(p => onObj(Object.assign({}, p, {t:'panel'}))); return; }
+    if(obj.query || obj.caption) onObj(Object.assign({}, obj, {t:'panel'}));
+    else if(obj.layout) onObj(Object.assign({}, obj, {t:'group'}));
+    else if(obj.title) onObj(Object.assign({}, obj, {t:'scene'}));
+  };
+  const scan = () => {
+    for(; i < buf.length; i++){
+      const c = buf[i];
+      if(inStr){ if(esc) esc = false; else if(c === '\\') esc = true; else if(c === '"') inStr = false; continue; }
+      if(c === '"'){ if(depth > 0) inStr = true; continue; }
+      if(c === '{'){ if(depth === 0) start = i; depth++; }
+      else if(c === '}' && depth > 0){
+        depth--;
+        if(depth === 0){ const chunk = buf.slice(start, i + 1); buf = buf.slice(i + 1); i = -1; start = -1; let o = null; try{ o = JSON.parse(chunk); }catch{} emit(o); }
+      }
+    }
+  };
+  return { push(t){ buf += t; scan(); }, end(){ scan(); } };
+}
+async function readSSE(resp, onData){
+  const reader = resp.body.getReader(), dec = new TextDecoder(); let buf = '';
+  for(;;){
+    const {value, done} = await reader.read(); if(done) break;
+    buf += dec.decode(value, {stream:true}); let i;
+    while((i = buf.indexOf('\n')) >= 0){
+      const line = buf.slice(0, i).replace(/\r$/, ''); buf = buf.slice(i + 1);
+      if(line.startsWith('data:')){ const d = line.slice(5).trim(); if(d && d !== '[DONE]'){ let j; try{ j = JSON.parse(d); }catch{ continue; } onData(j); } }
+    }
+  }
+}
+function friendly(status, body){
+  if(status === 400 && /api key|API_KEY/i.test(body)) return 'The API key was rejected. Open Settings and paste the key again.';
+  if(status === 401 || status === 403) return 'The API key was rejected. Open Settings and check the key for ' + (S.provider === 'claude' ? 'Claude.' : 'Gemini.');
+  if(status === 404) return 'Model “' + modelName() + '” was not found. Open Settings and check the model name. ' + (body || '').slice(0, 160);
+  if(status === 429) return 'Too many requests for this key. Wait a minute, or use a key with a higher limit.';
+  return 'The AI service answered ' + status + '. ' + (body || '').slice(0, 140);
+}
+
+/* ======================= AI calls ======================= */
+async function planStream(sentence, signal, onEvent){
+  let count = 0, raw = '', finish = '';
+  const lines = jsonLines(ev => { count++; onEvent(ev); });
+  const pushText = t => { raw += t; lines.push(t); };
+  const user = 'Sentence: ' + sentence;
+  let resp;
+  if(S.provider === 'claude'){
+    resp = await fetch('https://api.anthropic.com/v1/messages', { method:'POST', signal,
+      headers:{ 'content-type':'application/json', 'x-api-key':S.ckey, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+      body: JSON.stringify({ model:S.cmodel, max_tokens:1500, stream:true, system:PLANNER, messages:[{role:'user', content:user}] }) });
+    if(!resp.ok) throw new Error(friendly(resp.status, await resp.text()));
+    await readSSE(resp, d => {
+      if(d.type === 'content_block_delta' && d.delta && d.delta.type === 'text_delta') pushText(d.delta.text);
+      else if(d.type === 'error') throw new Error((d.error && d.error.message) || 'Claude stream error');
+    });
+  } else {
+    resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + enc(S.gmodel) + ':streamGenerateContent?alt=sse', { method:'POST', signal,
+      headers:{ 'content-type':'application/json', 'x-goog-api-key':S.gkey },
+      body: JSON.stringify({ systemInstruction:{parts:[{text:PLANNER}]}, contents:[{role:'user', parts:[{text:user}]}],
+        generationConfig:{ temperature:0.4, maxOutputTokens:4096 } }) });
+    if(!resp.ok) throw new Error(friendly(resp.status, await resp.text()));
+    await readSSE(resp, d => {
+      if(d.error) throw new Error(d.error.message || 'Gemini stream error');
+      const parts = d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts || [];
+      parts.forEach(p => { if(p.text && !p.thought) pushText(p.text); });
+      const c0 = d.candidates && d.candidates[0]; if(c0 && c0.finishReason) finish = c0.finishReason;
+      if(d.promptFeedback && d.promptFeedback.blockReason) finish = 'BLOCKED ' + d.promptFeedback.blockReason;
+    });
+  }
+  lines.end();
+  return {count, raw, finish};
+}
+
+async function imageToBase64(src){
+  const r = await withTimeout(fetch(src, {mode:'cors'}), 4000); if(!r.ok) throw new Error('img');
+  const blob = await r.blob(); if(blob.size > 4.5e6) throw new Error('big');
+  let type = blob.type; if(!/^image\/(jpeg|png|webp|gif)$/.test(type)) type = 'image/jpeg';
+  const data = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(',')[1]); fr.onerror = rej; fr.readAsDataURL(blob); });
+  return {type, data};
+}
+async function locateMark(p){
+  const alt = p.alts[p.ci]; if(!alt) return;
+  const src = alt.used || alt.src;
+  const ask = `Find the ${p.mark} in this picture. Reply with only JSON: {"found":true,"x":X,"y":Y} where X and Y are integers from 0 to 1000 for a point on the most clearly visible ${p.mark} (X from the left edge, Y from the top edge). If there is no ${p.mark}, reply {"found":false}.`;
+  let img = null; try{ img = await imageToBase64(src); }catch{}
+  let text = '';
+  if(S.provider === 'claude'){
+    const source = img ? {type:'base64', media_type:img.type, data:img.data} : {type:'url', url:src};
+    const r = await fetch('https://api.anthropic.com/v1/messages', { method:'POST',
+      headers:{ 'content-type':'application/json', 'x-api-key':S.ckey, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+      body: JSON.stringify({ model:S.cmodel, max_tokens:80, messages:[{role:'user', content:[{type:'image', source}, {type:'text', text:ask}]}] }) });
+    if(!r.ok) return;
+    const j = await r.json(); text = (j.content || []).map(c => c.text || '').join('');
+  } else {
+    if(!img) return;
+    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + enc(S.gmodel) + ':generateContent', { method:'POST',
+      headers:{ 'content-type':'application/json', 'x-goog-api-key':S.gkey },
+      body: JSON.stringify({ contents:[{role:'user', parts:[{inline_data:{mime_type:img.type, data:img.data}}, {text:ask}]}],
+        generationConfig:{ temperature:0, responseMimeType:'application/json' } }) });
+    if(!r.ok) return;
+    const j = await r.json();
+    text = ((j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || []).filter(x => !x.thought).map(x => x.text || '').join('');
+  }
+  const m = text.match(/\{[\s\S]*\}/); if(!m) return;
+  try{ const o = JSON.parse(m[0]); if(o.found && isFinite(o.x) && isFinite(o.y)) p.markPt = {x:Math.max(0, Math.min(1000, +o.x)), y:Math.max(0, Math.min(1000, +o.y)), src}; }catch{}
+}
+
+/* ======================= picture search ======================= */
+async function srcPixabay(p, signal){
+  if(!S.pixabay) return [];
+  const type = p.kind === 'illustration' ? 'illustration' : 'photo';
+  const j = await getJSON(`https://pixabay.com/api/?key=${enc(S.pixabay)}&q=${enc(p.query.slice(0, 95))}&image_type=${type}&safesearch=true&per_page=6&orientation=horizontal`, signal);
+  return (j.hits || []).map(h => ({src:h.largeImageURL || h.webformatURL, fb:h.webformatURL}));
+}
+async function srcWiki(p, signal){
+  if(!p.wiki) return [];
+  const j = await getJSON(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=1000&titles=${enc(p.wiki)}`, signal);
+  return Object.values((j.query && j.query.pages) || {}).map(pg => pg.thumbnail && pg.thumbnail.source).filter(Boolean).map(src => ({src}));
+}
+async function srcOpenverse(p, signal){
+  const cat = p.kind === 'illustration' ? '&category=illustration' : '';
+  const j = await getJSON(`https://api.openverse.org/v1/images/?q=${enc(p.query)}&page_size=6&mature=false${cat}`, signal);
+  return (j.results || []).map(r => ({src:r.url, fb:r.thumbnail}));
+}
+async function srcCommons(p, signal){
+  const j = await getJSON(`https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=6&gsrsearch=${enc(p.query + ' filetype:bitmap')}&prop=imageinfo&iiprop=url&iiurlwidth=1000`, signal);
+  return Object.values((j.query && j.query.pages) || {}).sort((a, b) => a.index - b.index)
+    .map(pg => pg.imageinfo && pg.imageinfo[0] && pg.imageinfo[0].thumburl).filter(Boolean).map(src => ({src}));
+}
+/* Runs every source at once. Waits a short grace period for the better sources, then takes the best that has answered.
+   Later answers are still added to the list of alternatives. */
+function searchImages(p, signal){
+  const sources = p.kind === 'illustration' ? [srcPixabay, srcOpenverse, srcCommons, srcWiki] : [srcPixabay, srcWiki, srcOpenverse, srcCommons];
+  const results = new Array(sources.length); let done = 0, graceOver = false, resolved = false; const alts = [];
+  return new Promise(resolve => {
+    const merge = () => { const seen = new Set(alts.map(a => a.src)); results.forEach(r => (r || []).forEach(a => { if(!seen.has(a.src)){ seen.add(a.src); alts.push(a); } })); };
+    const pick = () => {
+      if(resolved){ merge(); return; }
+      for(let i = 0; i < sources.length; i++){
+        if(results[i] === undefined){ if(!graceOver) return; continue; }
+        if(results[i].length){ resolved = true; merge(); resolve(alts); return; }
+      }
+      if(done === sources.length){ resolved = true; resolve(alts); }
+    };
+    sources.forEach((f, i) => f(p, signal).catch(e => { if(e.name !== 'AbortError') log(f.name.replace('src', '') + ' search failed for “' + p.query + '”: ' + e.message, 'err'); return []; }).then(r => { results[i] = r || []; done++; pick(); }));
+    setTimeout(() => { graceOver = true; pick(); }, 900);
+  });
+}
+async function findVideo(p, signal){
+  if(S.youtube){
+    try{
+      const j = await getJSON(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1&safeSearch=strict&videoEmbeddable=true&q=${enc(p.query + ' for kids')}&key=${enc(S.youtube)}`, signal);
+      const id = j.items && j.items[0] && j.items[0].id && j.items[0].id.videoId;
+      if(id) return {type:'yt', src:`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&rel=0&playsinline=1&modestbranding=1`};
+    }catch{}
+  }
+  if(S.pixabay){
+    try{
+      const j = await getJSON(`https://pixabay.com/api/videos/?key=${enc(S.pixabay)}&q=${enc(p.query.slice(0, 95))}&safesearch=true&per_page=3`, signal);
+      const h = j.hits && j.hits[0]; const v = h && h.videos && (h.videos.medium || h.videos.small);
+      if(v && v.url) return {type:'mp4', src:v.url};
+    }catch{}
+  }
+  return null;
+}
+async function resolvePanel(p, signal){
+  if(p.kind === 'symbol') return;
+  if(p.kind === 'video' && !p.video){ p.video = await findVideo(p, signal); }
+  if(!p.alts || !p.alts.length){ p.alts = await searchImages(p, signal); p.ci = 0; }
+}
+
+/* ======================= scene cache ======================= */
+const CACHE_KEY = 'sas.scenes.v1';
+let cache = load(CACHE_KEY, []);
+function serial(scene){
+  return { title:scene.title, title_ta:scene.title_ta, groups:scene.groups.map(g => ({ layout:g.layout, label:g.label, label_ta:g.label_ta,
+    panels:g.panels.map(p => ({ kind:p.kind, wiki:p.wiki, query:p.query, caption:p.caption, caption_ta:p.caption_ta, badge:p.badge, mark:p.mark, symbol:p.symbol,
+      alts:(p.alts || []).slice(0, 12), ci:p.ci || 0, markPt:p.markPt || null, video:p.video || null })) })) };
+}
+function saveScene(scene){
+  if(!scene.groups.length) return;
+  const n = norm(scene.sentence);
+  cache = cache.filter(c => c.n !== n);
+  cache.unshift({ n, s:scene.sentence, t:Date.now(), scene:serial(scene) });
+  if(cache.length > 300) cache.length = 300;
+  store(CACHE_KEY, cache);
+}
+function findCached(sentence){
+  const n = norm(sentence); let best = null, score = 0;
+  for(const c of cache){ if(c.n === n) return c; const j = jaccard(n, c.n); if(j > score){ score = j; best = c; } }
+  return score >= 0.75 ? best : null;
+}
+
+/* ======================= rendering ======================= */
+const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const ICON_CROSS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const ICON_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>';
+
+let current = null;         // scene on screen
+let stepIdx = 0;
+
+function newScene(sentence){ return { sentence, title:'', title_ta:'', groups:[], t0:performance.now(), firstShown:false }; }
+
+function mountScene(scene){
+  $('welcome').hidden = true;
+  const host = $('sceneHost'); host.textContent = '';
+  const sec = el('section', 'scene');
+  const head = el('header', 'scene-head');
+  scene.$title = el('h1', 'scene-title'); scene.$titleTa = el('p', 'scene-title-ta'); scene.$titleTa.lang = 'ta';
+  head.append(scene.$title, scene.$titleTa);
+  scene.$groups = el('div', 'groups');
+  scene.$stepper = el('nav', 'stepper'); scene.$stepper.hidden = true;
+  sec.append(head, scene.$groups, scene.$stepper); host.append(sec);
+  current = scene; stepIdx = 0;
+  setTitle(scene);
+}
+function setTitle(scene){
+  const t = scene.title || scene.sentence;
+  scene.$title.textContent = S.caption === 'ta' ? (scene.title_ta || t) : t;
+  scene.$titleTa.textContent = S.caption === 'both' ? (scene.title_ta || '') : '';
+  scene.$titleTa.hidden = !scene.$titleTa.textContent;
+}
+function addGroup(scene, g){
+  g.$ = el('div', 'group'); g.$.dataset.layout = g.layout || 'grid';
+  const lbl = S.caption === 'ta' ? (g.label_ta || g.label) : g.label;
+  if(lbl){ const l = el('p', 'group-label', lbl); g.$.append(l); }
+  g.$row = el('div', 'row'); g.$.append(g.$row);
+  scene.$groups.append(g.$);
+  layoutGroups(scene);
+}
+function layoutGroups(scene){
+  const n = scene.groups.length || 1;
+  const step = S.step && n > 1;
+  const visible = step ? 1 : n;
+  const h = visible === 1 ? 62 : visible === 2 ? 27 : 17;
+  document.documentElement.style.setProperty('--frame-max', h + 'dvh');
+  scene.groups.forEach((g, i) => { if(g.$) g.$.hidden = step && i !== stepIdx; });
+  scene.$stepper.hidden = !step;
+  if(step){
+    scene.$stepper.textContent = '';
+    const back = el('button', 'btn', 'Back'); back.type = 'button'; back.onclick = () => stepGroup(-1); back.disabled = stepIdx === 0;
+    const nx = el('button', 'btn primary', 'Next'); nx.type = 'button'; nx.onclick = () => stepGroup(1); nx.disabled = stepIdx >= n - 1;
+    scene.$stepper.append(back, el('span', null, (stepIdx + 1) + ' of ' + n), nx);
+  }
+}
+function stepGroup(d){
+  if(!current || !current.groups.length) return;
+  stepIdx = Math.max(0, Math.min(current.groups.length - 1, stepIdx + d));
+  layoutGroups(current);
+}
+function addPanel(scene, g, p){
+  if(g.panels.length > 1){
+    const sep = el('div', 'sep');
+    if(g.layout === 'sequence') sep.innerHTML = ICON_ARROW;
+    else if(g.layout === 'compare') sep.classList.add('vs');
+    if(g.layout === 'sequence' || g.layout === 'compare') g.$row.append(sep);
+  }
+  const fig = el('figure', 'panel');
+  const frame = el('div', 'frame'); frame.tabIndex = 0; frame.setAttribute('role', 'button');
+  frame.setAttribute('aria-label', 'Picture: ' + (p.caption || p.query) + '. Tap to swap.');
+  const sym = el('div', 'sym', p.symbol || '🖼️');
+  frame.append(sym);
+  if(p.badge === 'yes' || p.badge === 'no'){ const b = el('div', 'badge ' + p.badge); b.innerHTML = p.badge === 'yes' ? ICON_CHECK : ICON_CROSS; frame.append(b); }
+  fig.append(frame);
+  const cap = S.caption === 'ta' ? (p.caption_ta || p.caption) : p.caption;
+  if(cap) fig.append(el('figcaption', 'cap', cap));
+  if(S.caption === 'both' && p.caption_ta){ const t = el('div', 'cap-ta', p.caption_ta); t.lang = 'ta'; fig.append(t); }
+  g.$row.append(fig);
+  p.$frame = frame; p.$fig = fig;
+  frame.addEventListener('click', () => swapPicture(scene, p));
+  frame.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); swapPicture(scene, p); } });
+  new ResizeObserver(() => drawMark(p)).observe(frame);
+}
+function firstShown(scene){
+  if(scene.firstShown) return; scene.firstShown = true;
+  const ms = performance.now() - scene.t0;
+  $('lat').textContent = (scene.fromCache ? 'saved · ' : '') + (ms / 1000).toFixed(1) + ' s to first picture';
+}
+function showMedia(scene, p){
+  const f = p.$frame; if(!f) return;
+  if(p.kind === 'video' && p.video){
+    f.querySelectorAll('img,video,iframe').forEach(x => x.remove());
+    let m;
+    if(p.video.type === 'yt'){ m = document.createElement('iframe'); m.allow = 'autoplay; encrypted-media; picture-in-picture'; m.allowFullscreen = true; m.src = p.video.src; m.onload = () => { m.classList.add('on'); firstShown(scene); }; }
+    else { m = document.createElement('video'); Object.assign(m, {autoplay:true, muted:true, loop:true, playsInline:true, controls:true}); m.src = p.video.src; m.onloadeddata = () => { m.classList.add('on'); firstShown(scene); }; }
+    f.insertBefore(m, f.querySelector('.badge'));
+    return;
+  }
+  if(!p.alts || !p.alts.length) return;
+  let img = f.querySelector('img');
+  if(!img){ img = document.createElement('img'); img.alt = p.caption || p.query; img.decoding = 'async'; img.referrerPolicy = 'no-referrer'; f.insertBefore(img, f.querySelector('.badge')); }
+  img.classList.remove('on');
+  const tryAlt = (i, useFb) => {
+    const a = p.alts[i]; if(!a){ img.remove(); log('None of the pictures for “' + p.query + '” would load.', 'err'); return; }
+    const src = useFb ? a.fb : a.src;
+    img.onload = () => {
+      p.ci = i; a.used = src; img.classList.add('on'); firstShown(scene);
+      if(p.markPt && p.markPt.src !== src) p.markPt = null;
+      if(p.mark && S.marks && apiKey()){
+        if(p.markPt) drawMark(p);
+        else if(!p.marking){ p.marking = true; locateMark(p).catch(() => {}).then(() => { p.marking = false; drawMark(p); if(p.markPt && scene.saved) saveScene(scene); }); }
+      }
+    };
+    img.onerror = () => { if(!useFb && a.fb && a.fb !== a.src) tryAlt(i, true); else tryAlt(i + 1, false); };
+    img.src = src;
+  };
+  const start = Math.min(p.ci || 0, p.alts.length - 1);
+  const a0 = p.alts[start];
+  tryAlt(start, !!(a0 && a0.used && a0.used === a0.fb));
+}
+function swapPicture(scene, p){
+  if(p.kind === 'video' || !p.alts || p.alts.length < 2) return;
+  p.ci = ((p.ci || 0) + 1) % p.alts.length; p.markPt = null; clearMark(p);
+  showMedia(scene, p);
+  if(scene.saved) setTimeout(() => saveScene(scene), 1500);
+}
+function clearMark(p){ if(!p.$frame) return; p.$frame.querySelectorAll('svg.ov,.mark-label').forEach(x => x.remove()); }
+function drawMark(p){
+  clearMark(p);
+  const f = p.$frame, img = f && f.querySelector('img.on');
+  if(!p.markPt || !img || !img.naturalWidth || !S.marks) return;
+  const fw = f.clientWidth, fh = f.clientHeight, nw = img.naturalWidth, nh = img.naturalHeight;
+  const s = Math.min(fw / nw, fh / nh), cw = nw * s, ch = nh * s, ox = (fw - cw) / 2, oy = (fh - ch) / 2;
+  const px = ox + cw * p.markPt.x / 1000, py = oy + ch * p.markPt.y / 1000;
+  const r = Math.max(14, Math.min(fw, fh) * 0.06);
+  let lx = px + (px < fw / 2 ? 1 : -1) * Math.min(fw * 0.28, 140);
+  let ly = py + (py < fh / 2 ? 1 : -1) * Math.min(fh * 0.25, 90);
+  lx = Math.max(70, Math.min(fw - 70, lx)); ly = Math.max(26, Math.min(fh - 26, ly));
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'ov'); svg.setAttribute('viewBox', `0 0 ${fw} ${fh}`);
+  const mk = (tag, attrs) => { const e = document.createElementNS(NS, tag); for(const k in attrs) e.setAttribute(k, attrs[k]); svg.append(e); return e; };
+  const ang = Math.atan2(ly - py, lx - px);
+  const ex = px + Math.cos(ang) * r, ey = py + Math.sin(ang) * r;
+  mk('line', {x1:lx, y1:ly, x2:ex, y2:ey, stroke:'#000', 'stroke-opacity':'.45', 'stroke-width':8, 'stroke-linecap':'round'});
+  mk('line', {x1:lx, y1:ly, x2:ex, y2:ey, stroke:'var(--mark)', 'stroke-width':5, 'stroke-linecap':'round'});
+  mk('circle', {cx:px, cy:py, r:r, fill:'none', stroke:'#000', 'stroke-opacity':'.45', 'stroke-width':9});
+  mk('circle', {cx:px, cy:py, r:r, fill:'none', stroke:'var(--mark)', 'stroke-width':6});
+  f.insertBefore(svg, f.querySelector('.badge'));
+  const lab = el('div', 'mark-label', p.mark);
+  lab.style.left = lx + 'px'; lab.style.top = ly + 'px';
+  f.insertBefore(lab, f.querySelector('.badge'));
+}
+
+/* ======================= main flow ======================= */
+let ctrl = null;
+async function showSentence(sentence){
+  sentence = sentence.trim(); if(!sentence) return;
+  if(ctrl) ctrl.abort();
+  const hit = findCached(sentence);
+  if(hit){ log('Showing saved pictures for this sentence.', 'ok'); renderSaved(hit); return; }
+  if(!apiKey()){ setStatus('error', 'Add an AI key in Settings'); log('No AI key for ' + providerName() + '. Open Settings and paste it.', 'err'); openSettings(); return; }
+  ctrl = new AbortController(); const signal = ctrl.signal;
+  const scene = newScene(sentence); mountScene(scene);
+  setStatus('thinking', 'Making pictures…');
+  log('Asking ' + providerName() + ' (' + modelName() + ') to plan pictures…');
+  const jobs = []; let firstEv = true, nPanels = 0, plan;
+  try{
+    plan = await planStream(sentence, signal, ev => {
+      if(signal.aborted) return;
+      if(firstEv){ firstEv = false; log('AI started answering after ' + Math.round(performance.now() - scene.t0) + ' ms'); }
+      if(ev.t === 'panel') nPanels++;
+      if(ev.t === 'scene'){ scene.title = ev.title || ''; scene.title_ta = ev.title_ta || ''; setTitle(scene); }
+      else if(ev.t === 'group'){ const g = {layout:ev.layout || 'grid', label:ev.label || '', label_ta:ev.label_ta || '', panels:[]}; scene.groups.push(g); addGroup(scene, g); }
+      else if(ev.t === 'panel'){
+        if(!scene.groups.length){ const g = {layout:'single', label:'', label_ta:'', panels:[]}; scene.groups.push(g); addGroup(scene, g); }
+        const g = scene.groups[scene.groups.length - 1];
+        const p = { kind:ev.kind || 'photo', wiki:ev.wiki || '', query:ev.query || ev.caption || sentence, caption:ev.caption || '', caption_ta:ev.caption_ta || '',
+                    badge:ev.badge || '', mark:(ev.mark || '').trim(), symbol:ev.symbol || '', alts:[], ci:0 };
+        g.panels.push(p); addPanel(scene, g, p);
+        jobs.push(resolvePanel(p, signal).then(() => {
+          if(signal.aborted) return;
+          const n = (p.alts || []).length;
+          if(p.kind !== 'symbol') log('“' + p.query + '”: ' + (p.video ? 'video found, ' : '') + n + ' picture' + (n === 1 ? '' : 's') + ' found', n || p.video ? '' : 'err');
+          showMedia(scene, p);
+        }).catch(e => log('Picture search failed for “' + p.query + '”: ' + e.message, 'err')));
+      }
+    });
+  }catch(e){
+    if(e.name === 'AbortError') return;
+    const msg = /Failed to fetch|NetworkError|Load failed/i.test(e.message || '')
+      ? 'Could not reach ' + providerName() + '. Check the internet, or open the page from its https:// address instead of the file.'
+      : (e.message || 'Something went wrong');
+    setStatus('error', 'Error. Tap here for details'); log(msg, 'err'); return;
+  }
+  if(!nPanels){
+    setStatus('error', 'No pictures planned. Tap here for details');
+    log('The AI answered but planned no pictures' + (plan && plan.finish ? ' (stop reason: ' + plan.finish + ')' : '') + '. Start of its reply: ' + ((plan && plan.raw) || '(empty)').slice(0, 400), 'err');
+    return;
+  }
+  log('AI planned ' + nPanels + ' picture' + (nPanels === 1 ? '' : 's') + ' in ' + Math.round(performance.now() - scene.t0) + ' ms', 'ok');
+  setListeningStatus();
+  await Promise.allSettled(jobs.map(j => withTimeout(j, 8000)));
+  if(!signal.aborted){ scene.saved = true; saveScene(scene); }
+}
+function renderSaved(entry){
+  const scene = Object.assign(newScene(entry.s), JSON.parse(JSON.stringify(entry.scene)));
+  scene.fromCache = true; scene.saved = true;
+  mountScene(scene);
+  scene.groups.forEach(g => {
+    const panels = g.panels; g.panels = []; addGroup(scene, g);
+    panels.forEach(p => { g.panels.push(p); addPanel(scene, g, p); showMedia(scene, p); });
+  });
+  entry.t = Date.now(); store(CACHE_KEY, cache);
+  setListeningStatus();
+}
+function clearStage(){
+  if(ctrl) ctrl.abort();
+  current = null; $('sceneHost').textContent = '';
+  $('welcome').hidden = true; $('lat').textContent = '';
+}
+function runCommand(cmd){
+  const c = norm(cmd);
+  if(/^(clear|clear screen|stop|blank)$/.test(c)) return clearStage();
+  if(/^(next|next one)$/.test(c)) return stepGroup(1);
+  if(/^(back|previous|go back)$/.test(c)) return stepGroup(-1);
+  if(/^(again|repeat|show again)$/.test(c)){ if(current) showSentence(current.sentence); return; }
+  if(/^(home|help)$/.test(c)){ clearStage(); $('welcome').hidden = false; return; }
+  showSentence(cmd);
+}
+
+/* ======================= speech ======================= */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, listening = false, armed = false, armTimer = null, interimTimer = null, pendingInterim = '', lastCommit = null, wakeLock = null;
+
+function wakeRegex(){
+  const words = S.wake.split(',').map(w => w.trim()).filter(Boolean).map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+'));
+  if(!words.length) return null;
+  return new RegExp('(?:^|[\\s,.!?])(?:' + words.join('|') + ')(?=$|[\\s,.!?:;-])[\\s,.!?:;-]*', 'giu');
+}
+/* undefined = no wake word; '' = wake word alone; otherwise the words after the last wake word */
+function extractCommand(text){
+  const re = wakeRegex(); if(!re) return undefined;
+  let m, last = null; while((m = re.exec(text))) last = m;
+  if(last) return text.slice(last.index + last[0].length).trim();
+  /* near misses: one letter off (buddie, baddy, buddi) */
+  const words = S.wake.split(',').map(w => w.trim().toLowerCase()).filter(w => w.length >= 4 && !/\s/.test(w));
+  const tr = /[\p{L}\p{M}]+/gu; let hit = null;
+  while((m = tr.exec(text))){ const w = m[0].toLowerCase(); if(words.some(x => w[0] === x[0] && lev1(w, x))) hit = m; }
+  if(hit) return text.slice(hit.index + hit[0].length).replace(/^[\s,.!?:;-]+/, '').trim();
+  return undefined;
+}
+function arm(){ armed = true; setStatus('awake', 'Listening for your sentence…'); clearTimeout(armTimer); armTimer = setTimeout(() => { armed = false; setListeningStatus(); }, 8000); }
+function commit(cmd, fromInterim){
+  const n = norm(cmd); if(!n) return;
+  if(lastCommit && Date.now() - lastCommit.t < 6000){
+    const prev = lastCommit.n;
+    if(n === prev || jaccard(n, prev) >= 0.85) return;
+    if(!fromInterim && n.startsWith(prev) && n.length - prev.length <= 3) return;
+  }
+  lastCommit = {n, t:Date.now()}; armed = false; clearTimeout(armTimer);
+  log('Got it: "' + cmd + '"' + (fromInterim ? ' (on pause)' : ''), 'ok');
+  runCommand(cmd);
+}
+function onHeard(text, final){
+  let cmd = extractCommand(text);
+  if(cmd === undefined && armed) cmd = text.trim();
+  showHeard(text, final, cmd !== undefined);
+  if(cmd === undefined){ if(final) log('Heard, but no wake word, so ignored: "' + text.trim() + '"'); return; }
+  if(cmd === ''){ if(final){ log('Wake word heard. Waiting for the sentence.'); arm(); } return; }
+  if(final){ clearTimeout(interimTimer); pendingInterim = ''; commit(cmd, false); return; }
+  if(S.early && cmd.split(/\s+/).length >= 2 && cmd !== pendingInterim){
+    pendingInterim = cmd; clearTimeout(interimTimer);
+    interimTimer = setTimeout(() => { commit(pendingInterim, true); }, 700);
+  }
+}
+function startListening(){
+  if(!SR){ setStatus('error', 'Voice needs Chrome or Edge (Windows, Android) or Safari (iPhone). You can type instead.'); $('typebar').hidden = false; return; }
+  listening = true;
+  rec = new SR(); rec.lang = S.lang; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
+  rec.onresult = e => {
+    let interim = '';
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      const r = e.results[i];
+      if(r.isFinal) onHeard(r[0].transcript, true); else interim += r[0].transcript;
+    }
+    if(interim) onHeard(interim, false);
+  };
+  rec.onerror = e => {
+    if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){ stopListening(); setStatus('error', 'Microphone blocked. Allow the microphone for this page in the browser settings.'); }
+    else if(e.error === 'network'){ setStatus('error', 'Speech service unreachable. Check the internet connection.'); }
+  };
+  rec.onend = () => { if(listening) setTimeout(() => { try{ rec.start(); }catch{} }, 120); };
+  try{ rec.start(); }catch{}
+  $('micLabel').textContent = 'Stop listening'; $('micBtn').classList.add('on'); $('micBtn').classList.remove('primary');
+  setListeningStatus(); keepAwake();
+}
+function stopListening(){
+  listening = false; armed = false;
+  if(rec){ try{ rec.abort(); }catch{} rec = null; }
+  $('micLabel').textContent = 'Start listening'; $('micBtn').classList.remove('on'); $('micBtn').classList.add('primary');
+  setStatus('off', 'Not listening');
+  if(wakeLock){ wakeLock.release().catch(() => {}); wakeLock = null; }
+}
+async function keepAwake(){ try{ if('wakeLock' in navigator && document.visibilityState === 'visible') wakeLock = await navigator.wakeLock.request('screen'); }catch{} }
+document.addEventListener('visibilitychange', () => { if(listening && document.visibilityState === 'visible') keepAwake(); });
+
+/* ======================= status ======================= */
+function setStatus(s, text){ $('status').dataset.s = s; $('statusText').textContent = text; }
+function setListeningStatus(){ if(listening) setStatus('listening', 'Listening for “' + (S.wake.split(',')[0] || '').trim() + '”'); else setStatus('off', 'Not listening'); }
+function showHeard(text, final, woke){
+  const h = $('heard'); h.textContent = '';
+  h.append(document.createTextNode(!final ? 'Hearing: ' : woke === false ? 'Ignored, no wake word: ' : 'Heard: '));
+  const b = document.createElement('b'); b.textContent = text.trim(); h.append(b);
+}
+
+/* ======================= welcome ======================= */
+const EXAMPLES = ["Coconut trees don't have branches", 'Smoke, dust and germs pollute the air', 'A seed grows into a plant', 'Fish live in water, birds fly in the sky', 'Roots hold the plant in the soil'];
+function renderWelcome(){
+  const w = (S.wake.split(',')[0] || 'buddy').trim();
+  $('wakeShow').textContent = '“' + w.charAt(0).toUpperCase() + w.slice(1) + '”';
+  const ex = $('examples'); ex.textContent = '';
+  EXAMPLES.forEach(s => { const b = el('button', 'btn', s); b.type = 'button'; b.onclick = () => showSentence(s); ex.append(b); });
+  const cl = $('checklist'); cl.textContent = '';
+  const item = (ok, html) => { const li = el('li'); const m = el('span', ok ? 'ok' : 'todo', ok ? 'Done' : 'To do'); const t = el('span'); t.innerHTML = html; li.append(m, t); cl.append(li); };
+  item(!!apiKey(), 'Add a <b>Gemini</b> or <b>Claude</b> API key in Settings. This plans the pictures.');
+  item(!!S.pixabay, 'Optional: add a free <b>Pixabay</b> key for clearer photos and cartoons. Without it, pictures come from Wikipedia and Openverse.');
+  item(!!SR, SR ? 'This browser can listen. Press <b>Start listening</b> and allow the microphone.' : 'This browser cannot listen. Use Chrome or Edge on Windows or Android, or Safari on iPhone.');
+  const cmds = $('cmds'); cmds.textContent = '';
+  [[w + ' + sentence', 'Show pictures for the sentence'], [w + ' clear', 'Blank the screen'], [w + ' next / back', 'Move between groups in one-at-a-time mode'],
+   [w + ' again', 'Make fresh pictures for the last sentence'], [w + ' (pause)', 'Then say the sentence on its own'], ['Tap a picture', 'Swap it for another one; the choice is remembered']]
+   .forEach(([k, v]) => { cmds.append(el('dt', null, k), el('dd', null, v)); });
+}
+
+/* ======================= settings ======================= */
+const FIELDS = {provider:'s-provider', gkey:'s-gkey', gmodel:'s-gmodel', ckey:'s-ckey', cmodel:'s-cmodel', wake:'s-wake', lang:'s-lang', early:'s-early',
+                caption:'s-caption', pixabay:'s-pixabay', youtube:'s-youtube', marks:'s-marks', step:'s-step', lesson:'s-lesson'};
+function openSettings(){
+  for(const k in FIELDS){ const f = $(FIELDS[k]); if(f.type === 'checkbox') f.checked = !!S[k]; else f.value = S[k]; }
+  $('settings').showModal();
+}
+function readSettings(){
+  const prevLang = S.lang;
+  for(const k in FIELDS){ const f = $(FIELDS[k]); S[k] = f.type === 'checkbox' ? f.checked : f.value.trim(); }
+  if(!S.gmodel) S.gmodel = DEFAULTS.gmodel; if(!S.cmodel) S.cmodel = DEFAULTS.cmodel; if(!S.wake) S.wake = DEFAULTS.wake;
+  store('sas.settings', S);
+  if(listening && prevLang !== S.lang){ stopListening(); startListening(); }
+  renderWelcome(); if(current) layoutGroups(current);
+}
+$('setForm').addEventListener('submit', () => readSettings());
+$('closeBtn').onclick = () => $('settings').close();
+
+async function prepareLesson(){
+  readSettings();
+  const lines = S.lesson.split('\n').map(s => s.trim()).filter(Boolean);
+  if(!lines.length){ $('prog').textContent = 'Add some sentences first.'; return; }
+  if(!apiKey()){ $('prog').textContent = 'Add an AI key first.'; return; }
+  $('prepBtn').disabled = true; let made = 0, skipped = 0, failed = 0;
+  for(let i = 0; i < lines.length; i++){
+    $('prog').textContent = `Preparing ${i + 1} of ${lines.length}…`;
+    if(cache.some(c => c.n === norm(lines[i]))){ skipped++; continue; }
+    const scene = newScene(lines[i]); const ac = new AbortController();
+    try{
+      await planStream(lines[i], ac.signal, ev => {
+        if(ev.t === 'scene'){ scene.title = ev.title || ''; scene.title_ta = ev.title_ta || ''; }
+        else if(ev.t === 'group') scene.groups.push({layout:ev.layout || 'grid', label:ev.label || '', label_ta:ev.label_ta || '', panels:[]});
+        else if(ev.t === 'panel'){
+          if(!scene.groups.length) scene.groups.push({layout:'single', label:'', label_ta:'', panels:[]});
+          scene.groups[scene.groups.length - 1].panels.push({ kind:ev.kind || 'photo', wiki:ev.wiki || '', query:ev.query || ev.caption || lines[i], caption:ev.caption || '',
+            caption_ta:ev.caption_ta || '', badge:ev.badge || '', mark:(ev.mark || '').trim(), symbol:ev.symbol || '', alts:[], ci:0 });
+        }
+      });
+      const panels = scene.groups.flatMap(g => g.panels);
+      await Promise.allSettled(panels.map(p => withTimeout(resolvePanel(p, ac.signal), 9000)));
+      await Promise.allSettled(panels.map(p => p.alts && p.alts[0] ? withTimeout(new Promise((res, rej) => { const im = new Image(); im.referrerPolicy = 'no-referrer'; im.onload = res; im.onerror = rej; im.src = p.alts[0].src; }), 6000) : null));
+      if(S.marks) await Promise.allSettled(panels.filter(p => p.mark && p.alts && p.alts[0]).map(p => withTimeout(locateMark(p), 9000)));
+      saveScene(scene); made++;
+    }catch(e){ failed++; $('prog').textContent = e.message; await sleep(1200); }
+  }
+  $('prepBtn').disabled = false;
+  $('prog').textContent = `Ready: ${made} new, ${skipped} already saved` + (failed ? `, ${failed} failed` : '') + '.';
+}
+$('prepBtn').onclick = prepareLesson;
+$('wipeBtn').onclick = () => { cache = []; store(CACHE_KEY, cache); $('prog').textContent = 'Saved pictures cleared.'; };
+
+/* ======================= wiring ======================= */
+$('micBtn').onclick = () => listening ? stopListening() : startListening();
+$('talkBtn').onclick = () => { if(!listening) startListening(); arm(); };
+$('typeBtn').onclick = () => { $('typebar').hidden = !$('typebar').hidden; if(!$('typebar').hidden) $('typeInput').focus(); };
+$('typebar').addEventListener('submit', e => { e.preventDefault(); const v = $('typeInput').value; $('typeInput').value = ''; showHeard(v, true); runCommand(v); });
+$('clearBtn').onclick = clearStage;
+$('setBtn').onclick = openSettings;
+const toggleLog = show => { $('logBox').hidden = show === undefined ? !$('logBox').hidden : !show; };
+$('logBtn').onclick = () => toggleLog();
+$('status').onclick = () => toggleLog(true);
+$('logClose').onclick = () => toggleLog(false);
+$('logCopy').onclick = () => {
+  const text = [...$('logList').children].map(li => li.textContent).join('\n');
+  if(navigator.clipboard) navigator.clipboard.writeText(text).then(() => { $('logCopy').textContent = 'Copied'; }).catch(() => {});
+};
+async function testSetup(){
+  readSettings();
+  const out = []; const say = (t, kind) => { out.push(t); $('prog').textContent = out.join('\n'); log('Test: ' + t, kind); };
+  $('testBtn').disabled = true; $('prog').textContent = 'Testing…';
+  say(window.isSecureContext ? 'Page address OK (secure)' : 'Page is not on https:// or localhost, so the microphone may be blocked', window.isSecureContext ? 'ok' : 'err');
+  say(SR ? 'Voice: supported in this browser' : 'Voice: not supported in this browser. Use Chrome, Edge or Safari.', SR ? 'ok' : 'err');
+  if(!apiKey()) say('AI: no ' + providerName() + ' key entered', 'err');
+  else {
+    const t0 = performance.now(); let n = 0;
+    try{
+      const r = await withTimeout(planStream('Fish live in water', new AbortController().signal, ev => { if(ev.t === 'panel') n++; }), 30000);
+      if(n) say('AI: OK, ' + providerName() + ' planned ' + n + ' pictures in ' + Math.round(performance.now() - t0) + ' ms', 'ok');
+      else say('AI: answered but planned nothing' + (r.finish ? ' (' + r.finish + ')' : '') + '. Reply began: ' + (r.raw || '(empty)').slice(0, 160), 'err');
+    }catch(e){ say('AI: ' + (/Failed to fetch|NetworkError|Load failed/i.test(e.message) ? 'could not reach ' + providerName() + ' (network or blocked)' : e.message), 'err'); }
+  }
+  for(const [name, f] of [['Pixabay', srcPixabay], ['Wikipedia', srcWiki], ['Openverse', srcOpenverse], ['Wikimedia Commons', srcCommons]]){
+    if(name === 'Pixabay' && !S.pixabay){ say('Pixabay: no key (optional)'); continue; }
+    try{ const r = await withTimeout(f({kind:'photo', query:'elephant', wiki:'Elephant'}, undefined), 8000); say(name + ': ' + (r.length ? 'OK, ' + r.length + ' pictures' : 'answered with no pictures'), r.length ? 'ok' : 'err'); }
+    catch(e){ say(name + ': failed (' + e.message + ')', 'err'); }
+  }
+  $('testBtn').disabled = false;
+}
+$('testBtn').onclick = testSetup;
+function showGuide(lang){
+  const ta = lang === 'ta';
+  $('gEn').hidden = ta; $('gTa').hidden = !ta;
+  $('gEnTab').setAttribute('aria-selected', String(!ta)); $('gTaTab').setAttribute('aria-selected', String(ta));
+  $('guideTitle').textContent = ta ? 'பெற்றோர் வழிகாட்டி' : 'Parent guide';
+  store('sas.guideLang', lang);
+}
+const openGuide = () => { showGuide(load('sas.guideLang', 'en')); if(!$('guide').open) $('guide').showModal(); };
+$('guideBtn').onclick = openGuide; $('guideBtn2').onclick = openGuide;
+$('gEnTab').onclick = () => showGuide('en'); $('gTaTab').onclick = () => showGuide('ta');
+$('guideClose').onclick = () => $('guide').close();
+if(!document.documentElement.requestFullscreen) $('fsBtn').hidden = true;
+$('fsBtn').onclick = () => { if(document.fullscreenElement) document.exitFullscreen().catch(() => {}); else document.documentElement.requestFullscreen().catch(() => {}); };
+document.addEventListener('keydown', e => {
+  if(e.target.closest('input,textarea,select,dialog')) return;
+  if(e.key === 'ArrowRight') stepGroup(1); else if(e.key === 'ArrowLeft') stepGroup(-1); else if(e.key === 'Escape') clearStage();
+});
+renderWelcome();
+setListeningStatus();
+</script>
+</body>
 </html>
