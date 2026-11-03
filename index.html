@@ -64,7 +64,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .scene-title{font:700 clamp(1.6rem,3.6vw,2.8rem)/1.15 var(--font-display);margin:0;text-wrap:balance}
 .scene-title-ta{font:600 clamp(1.2rem,2.6vw,2rem)/1.3 var(--font-display);margin:4px 0 0;color:var(--muted)}
 .groups{display:flex;flex-direction:column;gap:22px}
-.group{display:flex;flex-direction:column;gap:8px;padding-bottom:4.2em}
+.group{display:flex;flex-direction:column;gap:8px;padding-bottom:5em}
 .group-label{margin:0;text-align:center;font-size:.95rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .row{display:flex;align-items:center;justify-content:center;gap:14px}
 .panel{flex:1 1 0;min-width:0;max-width:36rem;margin:0;display:flex;flex-direction:column;gap:8px;align-items:stretch}
@@ -135,10 +135,13 @@ legend{font-weight:700;padding:0 6px}
 .say.inline{position:static;display:inline-grid;vertical-align:middle;margin-left:12px;width:clamp(36px,3.4vw,46px);height:clamp(36px,3.4vw,46px);opacity:.55;box-shadow:none}
 .scene-title:hover .say.inline,.say.inline.talking{opacity:1}
 .cap{cursor:pointer;transform-origin:50% 0;transition:transform .28s cubic-bezier(.3,1.4,.5,1),color .2s ease;position:relative;z-index:1}
-.panel.speaking .cap{transform:scale(3);color:var(--accent);z-index:3}
+.panel{position:relative;transition:transform .32s cubic-bezier(.3,1.3,.5,1),opacity .25s ease}
+.panel.speaking{transform:scale(1.3);z-index:4}
+.panel.speaking .cap{transform:scale(2.3);color:var(--accent);z-index:3}
+.row:has(.panel.speaking) .panel:not(.speaking){opacity:.35}
 .panel.speaking .frame{box-shadow:0 0 0 5px var(--mark);border-color:var(--mark)}
 .group,.row{overflow:visible}
-@media (prefers-reduced-motion:reduce){.cap{transition:none}}
+@media (prefers-reduced-motion:reduce){.cap,.panel{transition:none}}
 @media (hover:none){.say{opacity:1;transform:none}.say.inline{opacity:1}}
 /* guide */
 .lang-tabs{display:flex;gap:6px}
@@ -262,6 +265,7 @@ legend{font-weight:700;padding:0 6px}
             <small>Optional. Strict safe search.</small></div>
         </div>
         <label class="chk"><input id="s-marks" type="checkbox"><span>Point at the part I name (branch, root, beak…)</span></label>
+        <label class="chk"><input id="s-judge" type="checkbox"><span>Check pictures with AI before showing them (about 1–2 seconds slower, much better matches)</span></label>
         <label class="chk"><input id="s-step" type="checkbox"><span>One group at a time (say “next” to move on)</span></label>
       </fieldset>
       <fieldset>
@@ -319,6 +323,7 @@ legend{font-weight:700;padding:0 6px}
 <li><b>Type</b> button: type a sentence instead of speaking.</li>
 <li><b>Prepare a lesson</b> (in Settings): type tomorrow's sentences, one per line, and tap <b>Prepare these</b>. The pictures then appear instantly during the lesson.</li>
 <li><b>Hear the word:</b> move the mouse over a picture (on a phone or tablet, the button is always there) and tap the <b>speaker</b>. It says the word in a UK English voice. Tapping the word under the picture works too. Change the voice or speed in Settings.</li>
+<li><b>Better pictures:</b> before showing a picture, the app asks the AI to check several photos and pick the clearest one. If a picture is still wrong, tap it to see the next one. Your choice is remembered.</li>
 <li><b>Word lists:</b> type or say a few words, like <i>Brown, bridge, brush</i>, to get one picture per word. Good for phonics and spelling.</li>
 <li>A clip-on microphone works much better than the phone's own microphone across a room.</li>
 </ul>
@@ -360,6 +365,7 @@ legend{font-weight:700;padding:0 6px}
 <li><b>Type</b>: பேசாமல் வாக்கியத்தை எழுதலாம்.</li>
 <li><b>Prepare a lesson</b> (Settings-இல்): நாளைய வாக்கியங்களை வரிக்கு ஒன்றாக எழுதி <b>Prepare these</b> அழுத்துங்கள். பாடத்தின்போது படங்கள் உடனே வரும்.</li>
 <li><b>சொல்லைக் கேட்க:</b> படத்தின் மேல் mouse-ஐ நகர்த்துங்கள் (கைபேசி, டேப்லெட்டில் பொத்தான் எப்போதும் தெரியும்). <b>ஒலிபெருக்கி</b> பொத்தானை அழுத்தினால், அந்த ஆங்கிலச் சொல் UK ஆங்கில உச்சரிப்பில் ஒலிக்கும். படத்தின் கீழே உள்ள சொல்லைத் தொட்டாலும் ஒலிக்கும்.</li>
+<li><b>சரியான படம்:</b> படத்தைக் காட்டும் முன், பல படங்களில் தெளிவானதை AI தேர்ந்தெடுக்கும். படம் இன்னும் பொருந்தவில்லை என்றால், அதைத் தொட்டு அடுத்த படத்தைப் பாருங்கள். உங்கள் தேர்வு நினைவில் இருக்கும்.</li>
 <li><b>சொல் பட்டியல்:</b> <i>Brown, bridge, brush</i> போன்ற சில சொற்களைச் சொன்னால் அல்லது எழுதினால், ஒவ்வொரு சொல்லுக்கும் ஒரு படம் வரும். ஒலிப்பு (phonics) கற்பிக்க உதவும்.</li>
 <li>அறையில் தூரத்திலிருந்து பேசும்போது, சட்டையில் மாட்டும் சிறிய மைக் நன்றாக வேலை செய்யும்.</li>
 </ul>
@@ -381,7 +387,7 @@ legend{font-weight:700;padding:0 6px}
 /* ======================= settings ======================= */
 const DEFAULTS = {
   provider:'gemini', gkey:'', gmodel:'gemini-3.6-flash', ckey:'', cmodel:'claude-haiku-5-5',
-  wake:'buddy', lang:'en-IN', early:true, voice:'', rate:'0.85', pixabay:'', youtube:'', marks:true, step:false, lesson:''
+  wake:'buddy', lang:'en-IN', early:true, voice:'', rate:'0.85', pixabay:'', youtube:'', marks:true, step:false, judge:true, lesson:''
 };
 const S = Object.assign({}, DEFAULTS, load('sas.settings', {}));
 function load(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch{ return d; } }
@@ -408,7 +414,7 @@ RULES
 - grid: 2 to 4 examples of the same kind of thing. single: 1 panel.
 - kind: photo for real, visible things; illustration for invisible or abstract things (germs, air, feelings, sickness) and for people doing actions; video only when the idea is a motion or process the child must see happen (a seed sprouting, a butterfly hatching, rain falling); symbol only if no picture would be clearer.
 - wiki: only for an animal, plant species, food, object or place whose Wikipedia lead image is a clear photo of it (e.g. "Elephant", "Nelumbo nucifera", "Volcano"). Otherwise "".
-- query: concrete, visual, child-safe search words. For illustration include the word "cartoon". Do not include words like "picture of".
+- query: concrete, visual, child-safe search words for a stock-photo site. Name the single most typical, recognisable example of the meaning intended, and add a word that removes other meanings (e.g. "hair brush" not "brush", "bat animal flying" not "bat", "brown teddy bear" for the colour brown, "boy jumping" for jump). For illustration include the word "cartoon". Do not include words like "picture of".
 - mark: when the sentence names a part (branch, leaf, root, trunk, stem, petal, beak, fin, wing, tail, wheel), set mark to that part on the panel where it is clearly visible, so the screen can point at it.
 - Captions use words a 5-year-old knows. English only.
 - WORD LIST: when the input is a list of words (e.g. "Brown, bridge, brush" while teaching phonics or spelling), make ONE grid group with no label and ONE panel per word, in the same order. The caption is exactly that word, with a capital first letter. Pick the picture a child would recognise for that word (for a colour, a plain object of that colour; for an action, a child doing it). Use a sequence of groups of up to 4 words if there are more than 4 words.
@@ -592,23 +598,25 @@ async function locateMark(p){
 async function srcPixabay(p, signal){
   if(!S.pixabay) return [];
   const type = p.kind === 'illustration' ? 'illustration' : 'photo';
-  const j = await getJSON(`https://pixabay.com/api/?key=${enc(S.pixabay)}&q=${enc(p.query.slice(0, 95))}&image_type=${type}&safesearch=true&per_page=6&orientation=horizontal`, signal);
-  return (j.hits || []).map(h => ({src:h.largeImageURL || h.webformatURL, fb:h.webformatURL}));
+  const j = await getJSON(`https://pixabay.com/api/?key=${enc(S.pixabay)}&q=${enc(p.query.slice(0, 95))}&image_type=${type}&safesearch=true&per_page=10&orientation=horizontal&order=popular`, signal);
+  return (j.hits || []).map(h => ({src:h.largeImageURL || h.webformatURL, fb:h.webformatURL, thumb:h.webformatURL, desc:h.tags || ''}));
 }
 async function srcWiki(p, signal){
   if(!p.wiki) return [];
   const j = await getJSON(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=1000&titles=${enc(p.wiki)}`, signal);
-  return Object.values((j.query && j.query.pages) || {}).map(pg => pg.thumbnail && pg.thumbnail.source).filter(Boolean).map(src => ({src}));
+  return Object.values((j.query && j.query.pages) || {}).filter(pg => pg.thumbnail && pg.thumbnail.source)
+    .map(pg => ({src:pg.thumbnail.source, thumb:pg.thumbnail.source.replace(/\/\d+px-/, '/400px-'), desc:'Wikipedia: ' + pg.title}));
 }
 async function srcOpenverse(p, signal){
   const cat = p.kind === 'illustration' ? '&category=illustration' : '';
   const j = await getJSON(`https://api.openverse.org/v1/images/?q=${enc(p.query)}&page_size=6&mature=false${cat}`, signal);
-  return (j.results || []).map(r => ({src:r.url, fb:r.thumbnail}));
+  return (j.results || []).map(r => ({src:r.url, fb:r.thumbnail, thumb:r.thumbnail, desc:[r.title].concat((r.tags || []).slice(0, 8).map(t => t.name)).filter(Boolean).join(', ')}));
 }
 async function srcCommons(p, signal){
   const j = await getJSON(`https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=6&gsrsearch=${enc(p.query + ' filetype:bitmap')}&prop=imageinfo&iiprop=url&iiurlwidth=1000`, signal);
   return Object.values((j.query && j.query.pages) || {}).sort((a, b) => a.index - b.index)
-    .map(pg => pg.imageinfo && pg.imageinfo[0] && pg.imageinfo[0].thumburl).filter(Boolean).map(src => ({src}));
+    .filter(pg => pg.imageinfo && pg.imageinfo[0] && pg.imageinfo[0].thumburl)
+    .map(pg => ({src:pg.imageinfo[0].thumburl, thumb:pg.imageinfo[0].thumburl.replace(/\/\d+px-/, '/400px-'), desc:pg.title.replace(/^File:/, '').replace(/\.\w+$/, '')}));
 }
 /* Runs every source at once. Waits a short grace period for the better sources, then takes the best that has answered.
    Later answers are still added to the list of alternatives. */
@@ -646,10 +654,80 @@ async function findVideo(p, signal){
   }
   return null;
 }
-async function resolvePanel(p, signal){
+/* Picture check: the AI looks at the candidate pictures and puts the clearest match first.
+   Claude fetches the pictures itself from their web addresses. Gemini needs the picture bytes, so pictures the
+   browser cannot read are judged by their description only. */
+async function thumbB64(url){
+  try{
+    const r = await withTimeout(fetch(url, {mode:'cors'}), 2500); if(!r.ok) return null;
+    const b = await r.blob(); if(b.size > 1.5e6) return null;
+    const type = /^image\/(jpeg|png|webp|gif)$/.test(b.type) ? b.type : 'image/jpeg';
+    const data = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(',')[1]); fr.onerror = rej; fr.readAsDataURL(b); });
+    return {type, data};
+  }catch{ return null; }
+}
+async function judgePanel(p, ctx){
+  const cands = p.alts.slice(0, 8); if(cands.length < 2) return;
+  const t0 = performance.now();
+  const ask = `A parent is teaching a young autistic child who learns from pictures. The picture must show: "${p.caption || p.query}".
+The parent said: "${ctx || p.caption}". The search words were: "${p.query}".
+Below are ${cands.length} candidate pictures, numbered from 1. Choose the ones a 5-year-old would instantly recognise as "${p.caption || p.query}" in the meaning the parent intends.
+Prefer: one clear main subject, the whole thing visible, plain or simple background, a typical everyday example, real photo or simple cartoon.
+Reject: a different meaning of the word, collages, mostly text, logos, abstract or artistic shots, close-ups that hide what it is, dark or scary pictures.
+Reply with only JSON: {"order":[numbers of the acceptable pictures, best first]}`;
+  let text = '';
+  if(S.provider === 'claude'){
+    const content = [];
+    cands.forEach((a, i) => {
+      content.push({type:'text', text:'Picture ' + (i + 1) + (a.desc ? ' (described as: ' + a.desc.slice(0, 120) + ')' : '')});
+      content.push({type:'image', source:{type:'url', url:a.thumb || a.fb || a.src}});
+    });
+    content.push({type:'text', text:ask});
+    let r = await fetch('https://api.anthropic.com/v1/messages', { method:'POST',
+      headers:{ 'content-type':'application/json', 'x-api-key':S.ckey, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+      body: JSON.stringify({ model:S.cmodel, max_tokens:60, messages:[{role:'user', content}] }) });
+    if(!r.ok){ /* a picture Claude could not fetch: fall back to descriptions */
+      const textOnly = cands.map((a, i) => 'Picture ' + (i + 1) + ': ' + (a.desc || 'no description')).join('\n') + '\n\n' + ask;
+      r = await fetch('https://api.anthropic.com/v1/messages', { method:'POST',
+        headers:{ 'content-type':'application/json', 'x-api-key':S.ckey, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+        body: JSON.stringify({ model:S.cmodel, max_tokens:60, messages:[{role:'user', content:textOnly}] }) });
+      if(!r.ok) return;
+    }
+    const j = await r.json(); text = (j.content || []).map(c => c.text || '').join('');
+  } else {
+    const imgs = await Promise.all(cands.map(a => thumbB64(a.thumb || a.fb || a.src)));
+    const parts = [];
+    cands.forEach((a, i) => {
+      parts.push({text:'Picture ' + (i + 1) + (a.desc ? ' (described as: ' + a.desc.slice(0, 120) + ')' : '') + (imgs[i] ? '' : ' [image not available, judge by description]')});
+      if(imgs[i]) parts.push({inline_data:{mime_type:imgs[i].type, data:imgs[i].data}});
+    });
+    parts.push({text:ask});
+    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + enc(S.gmodel) + ':generateContent', { method:'POST',
+      headers:{ 'content-type':'application/json', 'x-goog-api-key':S.gkey },
+      body: JSON.stringify({ contents:[{role:'user', parts}], generationConfig:{ temperature:0, responseMimeType:'application/json' } }) });
+    if(!r.ok) return;
+    const j = await r.json();
+    text = ((j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || []).filter(x => !x.thought).map(x => x.text || '').join('');
+  }
+  const m = text.match(/\{[\s\S]*\}/); if(!m) return;
+  let order; try{ order = JSON.parse(m[0]).order; }catch{ return; }
+  if(!Array.isArray(order)) return;
+  const good = [...new Set(order.map(n => parseInt(n, 10) - 1).filter(i => i >= 0 && i < cands.length))].map(i => cands[i]);
+  const rest = p.alts.filter(a => !good.includes(a));
+  p.alts.splice(0, p.alts.length, ...good, ...rest);
+  p.checked = true;
+  log('Checked pictures for “' + (p.caption || p.query) + '”: ' + good.length + ' of ' + cands.length + ' fit, best is #' + (good.length ? cands.indexOf(good[0]) + 1 : '–') + ' (' + Math.round(performance.now() - t0) + ' ms)', good.length ? 'ok' : 'err');
+}
+async function resolvePanel(p, signal, ctx){
   if(p.kind === 'symbol') return;
   if(p.kind === 'video' && !p.video){ p.video = await findVideo(p, signal); }
-  if(!p.alts || !p.alts.length){ p.alts = await searchImages(p, signal); p.ci = 0; }
+  if(!p.alts || !p.alts.length){
+    p.alts = await searchImages(p, signal); p.ci = 0;
+    if(S.judge && apiKey() && p.alts.length > 1 && !signal.aborted){
+      if(p.alts.length < 4) await sleep(500); /* let slower sources add a few more candidates */
+      try{ await withTimeout(judgePanel(p, ctx), 6000); }catch(e){ log('Picture check skipped for “' + (p.caption || p.query) + '”: ' + e.message); }
+    }
+  }
 }
 
 /* ======================= scene cache ======================= */
@@ -658,7 +736,7 @@ let cache = load(CACHE_KEY, []);
 function serial(scene){
   return { title:scene.title, title_ta:scene.title_ta, groups:scene.groups.map(g => ({ layout:g.layout, label:g.label, label_ta:g.label_ta,
     panels:g.panels.map(p => ({ kind:p.kind, wiki:p.wiki, query:p.query, caption:p.caption, caption_ta:p.caption_ta, badge:p.badge, mark:p.mark, symbol:p.symbol,
-      alts:(p.alts || []).slice(0, 12), ci:p.ci || 0, markPt:p.markPt || null, video:p.video || null })) })) };
+      alts:(p.alts || []).slice(0, 12).map(a => ({src:a.src, fb:a.fb, used:a.used})), ci:p.ci || 0, markPt:p.markPt || null, video:p.video || null })) })) };
 }
 function saveScene(scene){
   if(!scene.groups.length) return;
@@ -867,7 +945,7 @@ async function showSentence(sentence){
         const p = { kind:ev.kind || 'photo', wiki:ev.wiki || '', query:ev.query || ev.caption || sentence, caption:ev.caption || '', caption_ta:ev.caption_ta || '',
                     badge:ev.badge || '', mark:(ev.mark || '').trim(), symbol:ev.symbol || '', alts:[], ci:0 };
         g.panels.push(p); addPanel(scene, g, p);
-        jobs.push(resolvePanel(p, signal).then(() => {
+        jobs.push(resolvePanel(p, signal, sentence).then(() => {
           if(signal.aborted) return;
           const n = (p.alts || []).length;
           if(p.kind !== 'symbol') log('“' + p.query + '”: ' + (p.video ? 'video found, ' : '') + n + ' picture' + (n === 1 ? '' : 's') + ' found', n || p.video ? '' : 'err');
@@ -1080,7 +1158,7 @@ function renderWelcome(){
 
 /* ======================= settings ======================= */
 const FIELDS = {provider:'s-provider', gkey:'s-gkey', gmodel:'s-gmodel', ckey:'s-ckey', cmodel:'s-cmodel', wake:'s-wake', lang:'s-lang', early:'s-early',
-                voice:'s-voice', rate:'s-rate', pixabay:'s-pixabay', youtube:'s-youtube', marks:'s-marks', step:'s-step', lesson:'s-lesson'};
+                voice:'s-voice', rate:'s-rate', pixabay:'s-pixabay', youtube:'s-youtube', marks:'s-marks', step:'s-step', judge:'s-judge', lesson:'s-lesson'};
 function openSettings(){
   fillVoices();
   for(const k in FIELDS){ const f = $(FIELDS[k]); if(f.type === 'checkbox') f.checked = !!S[k]; else f.value = S[k]; }
@@ -1119,7 +1197,7 @@ async function prepareLesson(){
         }
       });
       const panels = scene.groups.flatMap(g => g.panels);
-      await Promise.allSettled(panels.map(p => withTimeout(resolvePanel(p, ac.signal), 9000)));
+      await Promise.allSettled(panels.map(p => withTimeout(resolvePanel(p, ac.signal, lines[i]), 12000)));
       await Promise.allSettled(panels.map(p => p.alts && p.alts[0] ? withTimeout(new Promise((res, rej) => { const im = new Image(); im.referrerPolicy = 'no-referrer'; im.onload = res; im.onerror = rej; im.src = p.alts[0].src; }), 6000) : null));
       if(S.marks) await Promise.allSettled(panels.filter(p => p.mark && p.alts && p.alts[0]).map(p => withTimeout(locateMark(p), 9000)));
       saveScene(scene); made++;
