@@ -125,6 +125,11 @@ legend{font-weight:700;padding:0 6px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .prog{font-size:.9rem;color:var(--muted);font-variant-numeric:tabular-nums}
 
+/* variation */
+.scene-head{display:flex;flex-direction:column;align-items:center;gap:8px}
+.btn.vary{font-weight:700;font-size:1.05rem;padding:9px 16px;border-color:var(--accent);color:var(--accent)}
+.btn.vary:hover{background:var(--accent);color:var(--accent-ink)}
+.vary-n{font-weight:400;font-size:.85em;opacity:.8;font-variant-numeric:tabular-nums}
 /* speaker */
 .say{position:absolute;left:10px;bottom:10px;width:clamp(44px,5vw,58px);height:clamp(44px,5vw,58px);border-radius:50%;border:0;cursor:pointer;
   display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);box-shadow:0 0 0 4px var(--surface);
@@ -322,6 +327,7 @@ legend{font-weight:700;padding:0 6px}
 <tr><td>Buddy, clear</td><td>Blank screen</td></tr>
 <tr><td>Buddy, next / Buddy, back</td><td>Move between picture groups (one-at-a-time mode)</td></tr>
 <tr><td>Buddy, again</td><td>New pictures for the last sentence</td></tr>
+<tr><td>Buddy, variation</td><td>Same idea with one thing changed: the boy is sleeping → the girl is sleeping</td></tr>
 </table></div>
 <ul>
 <li><b>Tap a picture</b> to change it. The app remembers your choice, so your child sees the same picture next time.</li>
@@ -364,6 +370,7 @@ legend{font-weight:700;padding:0 6px}
 <tr><td>Buddy, clear</td><td>திரை காலியாகும்</td></tr>
 <tr><td>Buddy, next / Buddy, back</td><td>அடுத்த / முந்தைய படக் குழு</td></tr>
 <tr><td>Buddy, again</td><td>கடைசி வாக்கியத்துக்குப் புதிய படங்கள்</td></tr>
+<tr><td>Buddy, variation</td><td>அதே கருத்து, ஒன்று மட்டும் மாறும்: the boy is sleeping → the girl is sleeping</td></tr>
 </table></div>
 <ul>
 <li><b>படத்தைத் தொட்டால்</b> வேறு படம் வரும். நீங்கள் தேர்ந்த படத்தை செயலி நினைவில் வைக்கும். அடுத்த முறையும் குழந்தைக்கு அதே படம் வரும்.</li>
@@ -415,6 +422,7 @@ Line types:
 
 RULES
 - Line 1 is the scene line. Then 1 to 3 groups, each followed by its panels. At most 8 panels in total. Fewer is better when the sentence is simple.
+- LAST LINE is always a vary line: {"t":"vary","items":["<variation 1>","<variation 2>",...]}. Give 3 to 5 variations of the parent's input that keep the same sentence pattern and change ONE key word the child can see, so the child learns the idea is the same for different things. Change who does it (boy, girl, woman, man, baby, dog), or the thing, animal, colour or place. Keep each easy to picture, smallest change first. For a word list, give other word lists that practise the same sound or pattern. Use "items":[] when no variation makes sense (a fact about one particular thing, such as "The sun is a star").
 - compare: exactly 2 panels that contrast (the thing and an opposite or different thing). badge "yes" on the panel that has the property the sentence talks about, "no" on the one that lacks it. Use compare whenever the sentence says "not", "don't", "no", "without", "unlike", or describes a property that is easier to see next to its opposite.
 - sequence: 2 to 4 panels in cause-and-effect or time order.
 - grid: 2 to 4 examples of the same kind of thing. single: 1 panel.
@@ -433,6 +441,7 @@ Sentence: Coconut trees don't have branches
 {"t":"group","layout":"compare","label":"No branches, branches"}
 {"t":"panel","kind":"photo","wiki":"","query":"coconut palm tree","caption":"Coconut tree","badge":"no","mark":"","symbol":"🌴"}
 {"t":"panel","kind":"photo","wiki":"","query":"mango tree branches","caption":"Mango tree","badge":"yes","mark":"branch","symbol":"🌳"}
+{"t":"vary","items":["Banana plants don't have branches","Mango trees have branches","Neem trees have branches"]}
 
 EXAMPLE
 Sentence: Smoke, dust and germs pollute the air
@@ -448,6 +457,7 @@ Sentence: Smoke, dust and germs pollute the air
 {"t":"panel","kind":"illustration","wiki":"","query":"boy breathing smoke cartoon","caption":"Breathes dirty air","badge":"","mark":"","symbol":"👦🌫️"}
 {"t":"panel","kind":"illustration","wiki":"","query":"boy coughing cartoon","caption":"Coughs","badge":"","mark":"","symbol":"😷"}
 {"t":"panel","kind":"illustration","wiki":"","query":"sick child resting in bed cartoon","caption":"Feels sick","badge":"","mark":"","symbol":"🤒🛏️"}
+{"t":"vary","items":[]}
 
 EXAMPLE
 Sentence: Brown, bridge, brush
@@ -455,7 +465,15 @@ Sentence: Brown, bridge, brush
 {"t":"group","layout":"grid","label":""}
 {"t":"panel","kind":"photo","wiki":"","query":"brown teddy bear","caption":"Brown","badge":"","mark":"","symbol":"🟤"}
 {"t":"panel","kind":"photo","wiki":"","query":"bridge over river","caption":"Bridge","badge":"","mark":"","symbol":"🌉"}
-{"t":"panel","kind":"photo","wiki":"","query":"hair brush","caption":"Brush","badge":"","mark":"","symbol":"🪮"}`;
+{"t":"panel","kind":"photo","wiki":"","query":"hair brush","caption":"Brush","badge":"","mark":"","symbol":"🪮"}
+{"t":"vary","items":["Bread, brick, broom","Crab, crown, crayon","Frog, fruit, fridge","Tree, train, truck"]}
+
+EXAMPLE
+Sentence: The boy is sleeping
+{"t":"scene","title":"The boy is sleeping"}
+{"t":"group","layout":"single","label":""}
+{"t":"panel","kind":"photo","wiki":"","query":"boy sleeping in bed","caption":"Boy sleeping","badge":"","mark":"","symbol":"👦😴"}
+{"t":"vary","items":["The girl is sleeping","The woman is sleeping","The man is sleeping","The baby is sleeping","The dog is sleeping"]}`;
 
 /* ======================= small utils ======================= */
 const enc = encodeURIComponent;
@@ -740,7 +758,7 @@ async function resolvePanel(p, signal, ctx){
 const CACHE_KEY = 'sas.scenes.v1';
 let cache = load(CACHE_KEY, []);
 function serial(scene){
-  return { title:scene.title, title_ta:scene.title_ta, groups:scene.groups.map(g => ({ layout:g.layout, label:g.label, label_ta:g.label_ta,
+  return { title:scene.title, title_ta:scene.title_ta, vary:scene.vary, groups:scene.groups.map(g => ({ layout:g.layout, label:g.label, label_ta:g.label_ta,
     panels:g.panels.map(p => ({ kind:p.kind, wiki:p.wiki, query:p.query, caption:p.caption, caption_ta:p.caption_ta, badge:p.badge, mark:p.mark, symbol:p.symbol,
       alts:(p.alts || []).slice(0, 12).map(a => ({src:a.src, fb:a.fb, used:a.used})), ci:p.ci || 0, markPt:p.markPt || null, video:p.video || null })) })) };
 }
@@ -754,8 +772,17 @@ function saveScene(scene){
 }
 function findCached(sentence){
   const n = norm(sentence); let best = null, score = 0;
-  for(const c of cache){ if(c.n === n) return c; const j = jaccard(n, c.n); if(j > score){ score = j; best = c; } }
-  return score >= 0.75 ? best : null;
+  /* near matches only when the sentences differ in small words (a, the, not …), never in a word the child sees */
+  const SMALL = new Set(['a','an','the','is','are','do','does','not','have','has','s','it','its','they','there']);
+  const A = tokens(n);
+  for(const c of cache){
+    if(c.n === n) return c;
+    const B = tokens(c.n); let ok = true;
+    A.forEach(w => { if(!B.has(w) && !SMALL.has(w)) ok = false; }); B.forEach(w => { if(!A.has(w) && !SMALL.has(w)) ok = false; });
+    if(!ok) continue;
+    const j = jaccard(n, c.n); if(j > score){ score = j; best = c; }
+  }
+  return score >= 0.6 ? best : null;
 }
 
 /* ======================= rendering ======================= */
@@ -785,12 +812,15 @@ function mountScene(scene){
     else speak(scene.$titleText.textContent, tsay);
   };
   scene.$title.append(tsay);
-  head.append(scene.$title, scene.$titleTa);
+  scene.$vary = el('button', 'btn vary'); scene.$vary.type = 'button'; scene.$vary.hidden = true;
+  scene.$vary.title = 'Show the same idea with something different';
+  scene.$vary.onclick = () => nextVariation();
+  head.append(scene.$title, scene.$titleTa, scene.$vary);
   scene.$groups = el('div', 'groups');
   scene.$stepper = el('nav', 'stepper'); scene.$stepper.hidden = true;
   sec.append(head, scene.$groups, scene.$stepper); host.append(sec);
   current = scene; stepIdx = 0;
-  setTitle(scene);
+  setTitle(scene); updateVary(scene);
 }
 function setTitle(scene){
   const t = scene.title || scene.sentence;
@@ -927,8 +957,59 @@ function drawMark(p){
 
 /* ======================= main flow ======================= */
 let ctrl = null;
-async function showSentence(sentence){
+/* Variation: the same idea with one thing changed (boy → girl → woman …). The family is the original sentence
+   plus its variations; the button walks through them and wraps back to the original. */
+let family = null;
+const ICON_SHUFFLE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>';
+function updateVary(scene){
+  const b = scene && scene.$vary; if(!b) return;
+  const fam = family && family.items.length > 1 ? family : null;
+  const has = fam || (scene.vary && scene.vary.length) || scene.vary === undefined && scene.saved;
+  b.hidden = !has;
+  if(!has) return;
+  b.innerHTML = ICON_SHUFFLE + '<span>Variation</span>' + (fam ? '<span class="vary-n">' + (fam.idx + 1) + ' of ' + fam.items.length + '</span>' : '');
+}
+async function fetchVariations(sentence){
+  const ask = 'Give 3 to 5 variations of this teaching sentence for a young child. Keep the same sentence pattern and change ONE key word the child can see (who does it, or the thing, animal, colour or place); smallest change first; easy to picture. For a word list, give other word lists that practise the same sound. If no variation makes sense, give an empty list. Reply with only JSON: {"items":[...]}\nSentence: ' + sentence;
+  let text = '';
+  if(S.provider === 'claude'){
+    const r = await fetch('https://api.anthropic.com/v1/messages', { method:'POST',
+      headers:{ 'content-type':'application/json', 'x-api-key':S.ckey, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+      body: JSON.stringify({ model:S.cmodel, max_tokens:200, messages:[{role:'user', content:ask}] }) });
+    if(!r.ok) throw new Error(friendly(r.status, await r.text()));
+    const j = await r.json(); text = (j.content || []).map(c => c.text || '').join('');
+  } else {
+    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + enc(S.gmodel) + ':generateContent', { method:'POST',
+      headers:{ 'content-type':'application/json', 'x-goog-api-key':S.gkey },
+      body: JSON.stringify({ contents:[{role:'user', parts:[{text:ask}]}], generationConfig:{ temperature:0.6, responseMimeType:'application/json' } }) });
+    if(!r.ok) throw new Error(friendly(r.status, await r.text()));
+    const j = await r.json();
+    text = ((j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || []).filter(x => !x.thought).map(x => x.text || '').join('');
+  }
+  const m = text.match(/\{[\s\S]*\}/); if(!m) return [];
+  try{ const items = JSON.parse(m[0]).items; return Array.isArray(items) ? items.filter(x => typeof x === 'string' && x.trim()).slice(0, 5) : []; }catch{ return []; }
+}
+async function nextVariation(){
+  if(!current) return;
+  if(!family || norm(family.items[family.idx]) !== norm(current.sentence)){
+    let items = current.vary;
+    if(items === undefined){
+      if(!apiKey()) return;
+      current.$vary.disabled = true; setStatus('thinking', 'Finding variations…');
+      try{ items = await fetchVariations(current.sentence); }catch(e){ log(e.message, 'err'); items = []; }
+      current.$vary.disabled = false; setListeningStatus();
+      current.vary = items; if(current.saved) saveScene(current);
+    }
+    if(!items || !items.length){ log('No variations for this sentence.'); current.$vary.hidden = true; return; }
+    family = {items:[current.sentence].concat(items), idx:0};
+  }
+  family.idx = (family.idx + 1) % family.items.length;
+  log('Variation ' + (family.idx + 1) + ' of ' + family.items.length + ': “' + family.items[family.idx] + '”', 'ok');
+  showSentence(family.items[family.idx], true);
+}
+async function showSentence(sentence, keepFamily){
   sentence = sentence.trim(); if(!sentence) return;
+  if(!keepFamily) family = null;
   if(ctrl) ctrl.abort();
   const hit = findCached(sentence);
   if(hit){ log('Showing saved pictures for this sentence.', 'ok'); renderSaved(hit); return; }
@@ -944,6 +1025,7 @@ async function showSentence(sentence){
       if(firstEv){ firstEv = false; log('AI started answering after ' + Math.round(performance.now() - scene.t0) + ' ms'); }
       if(ev.t === 'panel') nPanels++;
       if(ev.t === 'scene'){ scene.title = ev.title || ''; scene.title_ta = ev.title_ta || ''; setTitle(scene); }
+      else if(ev.t === 'vary'){ scene.vary = Array.isArray(ev.items) ? ev.items.filter(x => typeof x === 'string' && x.trim()).slice(0, 5) : []; updateVary(scene); }
       else if(ev.t === 'group'){ const g = {layout:ev.layout || 'grid', label:ev.label || '', label_ta:ev.label_ta || '', panels:[]}; scene.groups.push(g); addGroup(scene, g); }
       else if(ev.t === 'panel'){
         if(!scene.groups.length){ const g = {layout:'single', label:'', label_ta:'', panels:[]}; scene.groups.push(g); addGroup(scene, g); }
@@ -974,7 +1056,7 @@ async function showSentence(sentence){
   log('AI planned ' + nPanels + ' picture' + (nPanels === 1 ? '' : 's') + ' in ' + Math.round(performance.now() - scene.t0) + ' ms', 'ok');
   setListeningStatus();
   await Promise.allSettled(jobs.map(j => withTimeout(j, 8000)));
-  if(!signal.aborted){ scene.saved = true; saveScene(scene); }
+  if(!signal.aborted){ scene.saved = true; if(scene.vary === undefined) scene.vary = []; saveScene(scene); updateVary(scene); }
 }
 function renderSaved(entry){
   const scene = Object.assign(newScene(entry.s), JSON.parse(JSON.stringify(entry.scene)));
@@ -998,6 +1080,7 @@ function runCommand(cmd){
   if(/^(next|next one)$/.test(c)) return stepGroup(1);
   if(/^(back|previous|go back)$/.test(c)) return stepGroup(-1);
   if(/^(again|repeat|show again)$/.test(c)){ if(current) showSentence(current.sentence); return; }
+  if(/^(variation|another|another one|change|change it|different one)$/.test(c)){ nextVariation(); return; }
   if(/^(home|help)$/.test(c)){ clearStage(); $('welcome').hidden = false; return; }
   showSentence(cmd);
 }
@@ -1199,7 +1282,7 @@ function renderWelcome(){
   item(!!SR, SR ? 'This browser can listen. Press <b>Start listening</b> and allow the microphone.' : 'This browser cannot listen. Use Chrome or Edge on Windows or Android, or Safari on iPhone.');
   const cmds = $('cmds'); cmds.textContent = '';
   [[w + ' + sentence', 'Show pictures for the sentence'], [w + ' clear', 'Blank the screen'], [w + ' next / back', 'Move between groups in one-at-a-time mode'],
-   [w + ' again', 'Make fresh pictures for the last sentence'], [w + ' (pause)', 'Then say the sentence on its own'], ['Tap a picture', 'Swap it for another one; the choice is remembered']]
+   [w + ' again', 'Make fresh pictures for the last sentence'], [w + ' variation', 'Same idea, one thing changed (boy → girl → woman)'], [w + ' (pause)', 'Then say the sentence on its own'], ['Tap a picture', 'Swap it for another one; the choice is remembered']]
    .forEach(([k, v]) => { cmds.append(el('dt', null, k), el('dd', null, v)); });
 }
 
@@ -1236,6 +1319,7 @@ async function prepareLesson(){
     try{
       await planStream(lines[i], ac.signal, ev => {
         if(ev.t === 'scene'){ scene.title = ev.title || ''; scene.title_ta = ev.title_ta || ''; }
+        else if(ev.t === 'vary') scene.vary = Array.isArray(ev.items) ? ev.items.slice(0, 5) : [];
         else if(ev.t === 'group') scene.groups.push({layout:ev.layout || 'grid', label:ev.label || '', label_ta:ev.label_ta || '', panels:[]});
         else if(ev.t === 'panel'){
           if(!scene.groups.length) scene.groups.push({layout:'single', label:'', label_ta:'', panels:[]});
