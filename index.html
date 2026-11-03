@@ -64,7 +64,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .scene-title{font:700 clamp(1.6rem,3.6vw,2.8rem)/1.15 var(--font-display);margin:0;text-wrap:balance}
 .scene-title-ta{font:600 clamp(1.2rem,2.6vw,2rem)/1.3 var(--font-display);margin:4px 0 0;color:var(--muted)}
 .groups{display:flex;flex-direction:column;gap:22px}
-.group{display:flex;flex-direction:column;gap:8px;padding-bottom:5em}
+.group{display:flex;flex-direction:column;gap:8px}
 .group-label{margin:0;text-align:center;font-size:.95rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .row{display:flex;align-items:center;justify-content:center;gap:14px}
 .panel{flex:1 1 0;min-width:0;max-width:36rem;margin:0;display:flex;flex-direction:column;gap:8px;align-items:stretch}
@@ -134,14 +134,20 @@ legend{font-weight:700;padding:0 6px}
 .say.talking{background:var(--mark);color:var(--mark-ink)}
 .say.inline{position:static;display:inline-grid;vertical-align:middle;margin-left:12px;width:clamp(36px,3.4vw,46px);height:clamp(36px,3.4vw,46px);opacity:.55;box-shadow:none}
 .scene-title:hover .say.inline,.say.inline.talking{opacity:1}
-.cap{cursor:pointer;transform-origin:50% 0;transition:transform .28s cubic-bezier(.3,1.4,.5,1),color .2s ease;position:relative;z-index:1}
-.panel{position:relative;transition:transform .32s cubic-bezier(.3,1.3,.5,1),opacity .25s ease}
-.panel.speaking{transform:scale(1.3);z-index:4}
-.panel.speaking .cap{transform:scale(2.3);color:var(--accent);z-index:3}
-.row:has(.panel.speaking) .panel:not(.speaking){opacity:.35}
+.cap{cursor:pointer;transition:color .2s ease}
+.panel.speaking .cap{color:var(--accent)}
+/* spotlight: the spoken picture grows to 3x and its word to 5x, centred over a soft backdrop */
+.spot{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:color-mix(in srgb,var(--bg) 86%,transparent);
+  opacity:0;transition:opacity .25s ease;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.spot.on{opacity:1}
+.spot-card{display:flex;flex-direction:column;align-items:center;gap:14px;transition:transform .38s cubic-bezier(.3,1.15,.5,1)}
+.spot-pic{position:relative;background:var(--surface);border-radius:22px;overflow:hidden;box-shadow:0 0 0 6px var(--mark),0 18px 50px rgba(0,0,0,.25)}
+.spot-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.spot-pic .sym{position:absolute;inset:0;display:grid;place-items:center;line-height:1}
+.spot-word{font-family:var(--font-display);font-weight:700;line-height:1.05;color:var(--accent);white-space:nowrap;text-align:center}
 .panel.speaking .frame{box-shadow:0 0 0 5px var(--mark);border-color:var(--mark)}
 .group,.row{overflow:visible}
-@media (prefers-reduced-motion:reduce){.cap,.panel{transition:none}}
+@media (prefers-reduced-motion:reduce){.cap,.spot,.spot-card{transition:none}}
 @media (hover:none){.say{opacity:1;transform:none}.say.inline{opacity:1}}
 /* guide */
 .lang-tabs{display:flex;gap:6px}
@@ -1083,7 +1089,48 @@ function englishVoices(){
 }
 function pickVoice(){ const v = englishVoices(); return (S.voice && v.find(x => x.voiceURI === S.voice)) || v[0] || null; }
 let seqId = 0;
-function clearEmphasis(){ document.querySelectorAll('.talking,.speaking').forEach(x => x.classList.remove('talking', 'speaking')); }
+function clearEmphasis(){ document.querySelectorAll('.talking,.speaking').forEach(x => x.classList.remove('talking', 'speaking')); spotOff(true); }
+const PIC_ZOOM = 3, WORD_ZOOM = 5;
+let spotEl = null;
+function spotOn(fig, word){
+  spotOff(true);
+  const frame = fig && fig.querySelector('.frame'); if(!frame) return;
+  const fr = frame.getBoundingClientRect(); if(!fr.width) return;
+  const capEl = fig.querySelector('.cap');
+  const basePx = capEl ? parseFloat(getComputedStyle(capEl).fontSize) : 24;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  /* word: 5x, shrunk only if it would not fit across the screen */
+  let wordPx = basePx * WORD_ZOOM;
+  const probe = el('span', 'spot-word', word); probe.style.cssText = 'position:fixed;visibility:hidden;font-size:' + wordPx + 'px';
+  document.body.append(probe); const ww = probe.getBoundingClientRect().width; probe.remove();
+  if(ww > vw * 0.94) wordPx *= vw * 0.94 / ww;
+  /* picture: 3x, shrunk only if it would not fit with the word under it */
+  const f = Math.min(PIC_ZOOM, vw * 0.94 / fr.width, (vh * 0.94 - wordPx * 1.1 - 20) / fr.height);
+  const spot = el('div', 'spot'); spot.setAttribute('aria-hidden', 'true');
+  const card = el('div', 'spot-card');
+  const pic = el('div', 'spot-pic'); pic.style.width = fr.width * f + 'px'; pic.style.height = fr.height * f + 'px';
+  const img = frame.querySelector('img.on');
+  if(img){ const im = document.createElement('img'); im.src = img.currentSrc || img.src; im.alt = ''; pic.append(im); }
+  else { const sy = frame.querySelector('.sym'); const d = el('div', 'sym', sy ? sy.textContent : ''); d.style.fontSize = Math.min(fr.height * f * 0.5, 260) + 'px'; pic.append(d); }
+  const w = el('div', 'spot-word', word); w.style.fontSize = wordPx + 'px';
+  card.append(pic, w); spot.append(card); document.body.append(spot);
+  spot.addEventListener('click', () => { seqId++; if(TTS) TTS.cancel(); clearEmphasis(); });
+  /* grow out of the picture's own place on the page */
+  const pr = pic.getBoundingClientRect(), cr = card.getBoundingClientRect();
+  card.style.transformOrigin = (pr.left + pr.width / 2 - cr.left) + 'px ' + (pr.top + pr.height / 2 - cr.top) + 'px';
+  const dx = (fr.left + fr.width / 2) - (pr.left + pr.width / 2), dy = (fr.top + fr.height / 2) - (pr.top + pr.height / 2);
+  card.style.transform = `translate(${dx}px,${dy}px) scale(${1 / f})`;
+  card.dataset.back = card.style.transform;
+  void card.offsetWidth;
+  spot.classList.add('on'); card.style.transform = 'none';
+  spotEl = spot;
+}
+function spotOff(now){
+  const spot = spotEl; if(!spot) return; spotEl = null;
+  if(now){ spot.remove(); return; }
+  const card = spot.firstChild; if(card && card.dataset.back) card.style.transform = card.dataset.back;
+  spot.classList.remove('on'); setTimeout(() => spot.remove(), 380);
+}
 /* Says one word or phrase. While it is being said, its button lights up and its picture's caption zooms. */
 function utter(text, btn, fig){
   return new Promise(resolve => {
@@ -1093,11 +1140,11 @@ function utter(text, btn, fig){
     let done = false;
     const finish = () => {
       if(done) return; done = true; clearTimeout(guard);
-      setTimeout(() => { if(btn) btn.classList.remove('talking'); if(fig) fig.classList.remove('speaking'); resolve(); }, 250);
+      setTimeout(() => { if(btn) btn.classList.remove('talking'); if(fig){ fig.classList.remove('speaking'); spotOff(false); } setTimeout(resolve, fig ? 300 : 0); }, 350);
     };
     /* some browsers never fire onend: release after a generous estimate */
     const guard = setTimeout(finish, 1500 + text.length * 180 / u.rate);
-    if(btn) btn.classList.add('talking'); if(fig) fig.classList.add('speaking');
+    if(btn) btn.classList.add('talking'); if(fig){ fig.classList.add('speaking'); spotOn(fig, text); }
     u.onend = u.onerror = finish;
     TTS.speak(u);
   });
