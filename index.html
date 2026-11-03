@@ -64,7 +64,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .scene-title{font:700 clamp(1.6rem,3.6vw,2.8rem)/1.15 var(--font-display);margin:0;text-wrap:balance}
 .scene-title-ta{font:600 clamp(1.2rem,2.6vw,2rem)/1.3 var(--font-display);margin:4px 0 0;color:var(--muted)}
 .groups{display:flex;flex-direction:column;gap:22px}
-.group{display:flex;flex-direction:column;gap:8px}
+.group{display:flex;flex-direction:column;gap:8px;padding-bottom:1.6em}
 .group-label{margin:0;text-align:center;font-size:.95rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .row{display:flex;align-items:center;justify-content:center;gap:14px}
 .panel{flex:1 1 0;min-width:0;max-width:36rem;margin:0;display:flex;flex-direction:column;gap:8px;align-items:stretch}
@@ -125,6 +125,21 @@ legend{font-weight:700;padding:0 6px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .prog{font-size:.9rem;color:var(--muted);font-variant-numeric:tabular-nums}
 
+/* speaker */
+.say{position:absolute;left:10px;bottom:10px;width:clamp(44px,5vw,58px);height:clamp(44px,5vw,58px);border-radius:50%;border:0;cursor:pointer;
+  display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);box-shadow:0 0 0 4px var(--surface);
+  opacity:0;transform:scale(.9);transition:opacity .15s ease,transform .15s ease;z-index:2}
+.say svg{width:58%;height:58%}
+.frame:hover .say,.frame:focus-within .say,.say:focus-visible,.say.talking{opacity:1;transform:none}
+.say.talking{background:var(--mark);color:var(--mark-ink)}
+.say.inline{position:static;display:inline-grid;vertical-align:middle;margin-left:12px;width:clamp(36px,3.4vw,46px);height:clamp(36px,3.4vw,46px);opacity:.55;box-shadow:none}
+.scene-title:hover .say.inline,.say.inline.talking{opacity:1}
+.cap{cursor:pointer;transform-origin:50% 0;transition:transform .28s cubic-bezier(.3,1.4,.5,1),color .2s ease;position:relative;z-index:1}
+.panel.speaking .cap{transform:scale(1.7);color:var(--accent)}
+.panel.speaking .frame{box-shadow:0 0 0 5px var(--mark);border-color:var(--mark)}
+.group,.row{overflow:visible}
+@media (prefers-reduced-motion:reduce){.cap{transition:none}}
+@media (hover:none){.say{opacity:1;transform:none}.say.inline{opacity:1}}
 /* guide */
 .lang-tabs{display:flex;gap:6px}
 .lang-tabs .btn[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
@@ -227,16 +242,19 @@ legend{font-weight:700;padding:0 6px}
         <legend>Listening</legend>
         <div class="two">
           <div class="f"><label for="s-wake">Wake words</label><input id="s-wake" type="text" autocomplete="off">
-            <small>Comma separated. Add the Tamil spelling too if you listen in Tamil.</small></div>
+            <small>Comma separated, e.g. buddy, baddy</small></div>
           <div class="f"><label for="s-lang">I speak in</label>
-            <select id="s-lang"><option value="en-IN">English (India)</option><option value="en-GB">English (UK)</option><option value="en-US">English (US)</option><option value="ta-IN">தமிழ் Tamil</option></select></div>
+            <select id="s-lang"><option value="en-IN">English (India)</option><option value="en-GB">English (UK)</option><option value="en-US">English (US)</option></select></div>
         </div>
         <label class="chk"><input id="s-early" type="checkbox"><span>Start as soon as I pause (faster, may run twice on long sentences)</span></label>
       </fieldset>
       <fieldset>
         <legend>Pictures</legend>
-        <div class="f"><label for="s-caption">Words under pictures</label>
-          <select id="s-caption"><option value="en">English</option><option value="ta">Tamil</option><option value="both">English and Tamil</option></select></div>
+        <div class="f"><label for="s-voice">Voice for saying words</label>
+          <div style="display:flex;gap:8px"><select id="s-voice" style="flex:1;min-width:0"></select><button class="btn" type="button" id="voiceTest">Play</button></div>
+          <small>UK English voices are listed first. The choice is kept on this device.</small></div>
+        <div class="f"><label for="s-rate">Speaking speed</label>
+          <select id="s-rate"><option value="0.7">Slow</option><option value="0.85">Gentle</option><option value="1">Normal</option></select></div>
         <div class="two">
           <div class="f"><label for="s-pixabay">Pixabay key (recommended)</label><input id="s-pixabay" type="password" autocomplete="off">
             <small>Free. Better photos and cartoons, safe search on.</small></div>
@@ -300,7 +318,8 @@ legend{font-weight:700;padding:0 6px}
 <li><b>Talk now</b> button: the next sentence works without saying “buddy”.</li>
 <li><b>Type</b> button: type a sentence instead of speaking.</li>
 <li><b>Prepare a lesson</b> (in Settings): type tomorrow's sentences, one per line, and tap <b>Prepare these</b>. The pictures then appear instantly during the lesson.</li>
-<li><b>Tamil:</b> in Settings, set <b>I speak in</b> to Tamil and <b>Words under pictures</b> to Tamil or both. Add பட்டி to the wake words.</li>
+<li><b>Hear the word:</b> move the mouse over a picture (on a phone or tablet, the button is always there) and tap the <b>speaker</b>. It says the word in a UK English voice. Tapping the word under the picture works too. Change the voice or speed in Settings.</li>
+<li><b>Word lists:</b> type or say a few words, like <i>Brown, bridge, brush</i>, to get one picture per word. Good for phonics and spelling.</li>
 <li>A clip-on microphone works much better than the phone's own microphone across a room.</li>
 </ul>
 <h3>If pictures don't appear</h3>
@@ -340,7 +359,8 @@ legend{font-weight:700;padding:0 6px}
 <li><b>Talk now</b>: அடுத்த வாக்கியத்துக்கு “buddy” சொல்லத் தேவையில்லை.</li>
 <li><b>Type</b>: பேசாமல் வாக்கியத்தை எழுதலாம்.</li>
 <li><b>Prepare a lesson</b> (Settings-இல்): நாளைய வாக்கியங்களை வரிக்கு ஒன்றாக எழுதி <b>Prepare these</b> அழுத்துங்கள். பாடத்தின்போது படங்கள் உடனே வரும்.</li>
-<li><b>தமிழில் பேச:</b> Settings-இல் <b>I speak in</b> என்பதை Tamil ஆக்குங்கள். Wake words பெட்டியில் பட்டி என்று சேர்க்கவும். படங்களின் கீழே தமிழ் வேண்டுமானால் <b>Words under pictures</b> என்பதை Tamil ஆக்குங்கள்.</li>
+<li><b>சொல்லைக் கேட்க:</b> படத்தின் மேல் mouse-ஐ நகர்த்துங்கள் (கைபேசி, டேப்லெட்டில் பொத்தான் எப்போதும் தெரியும்). <b>ஒலிபெருக்கி</b> பொத்தானை அழுத்தினால், அந்த ஆங்கிலச் சொல் UK ஆங்கில உச்சரிப்பில் ஒலிக்கும். படத்தின் கீழே உள்ள சொல்லைத் தொட்டாலும் ஒலிக்கும்.</li>
+<li><b>சொல் பட்டியல்:</b> <i>Brown, bridge, brush</i> போன்ற சில சொற்களைச் சொன்னால் அல்லது எழுதினால், ஒவ்வொரு சொல்லுக்கும் ஒரு படம் வரும். ஒலிப்பு (phonics) கற்பிக்க உதவும்.</li>
 <li>அறையில் தூரத்திலிருந்து பேசும்போது, சட்டையில் மாட்டும் சிறிய மைக் நன்றாக வேலை செய்யும்.</li>
 </ul>
 <h3>படம் வரவில்லை என்றால்</h3>
@@ -361,7 +381,7 @@ legend{font-weight:700;padding:0 6px}
 /* ======================= settings ======================= */
 const DEFAULTS = {
   provider:'gemini', gkey:'', gmodel:'gemini-3.6-flash', ckey:'', cmodel:'claude-haiku-5-5',
-  wake:'buddy', lang:'en-IN', early:true, caption:'en', pixabay:'', youtube:'', marks:true, step:false, lesson:''
+  wake:'buddy', lang:'en-IN', early:true, voice:'', rate:'0.85', pixabay:'', youtube:'', marks:true, step:false, lesson:''
 };
 const S = Object.assign({}, DEFAULTS, load('sas.settings', {}));
 function load(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch{ return d; } }
@@ -372,14 +392,14 @@ const providerName = () => S.provider === 'claude' ? 'Claude' : 'Gemini';
 const modelName = () => S.provider === 'claude' ? S.cmodel : S.gmodel;
 
 /* ======================= planner prompt ======================= */
-const PLANNER = `You plan pictures for a teaching screen. A parent is teaching a young autistic child who learns visually. The parent says one sentence (English or Tamil). You choose a few pictures that make the meaning obvious at a glance.
+const PLANNER = `You plan pictures for a teaching screen. A parent is teaching a young autistic child who learns visually. The parent says one English sentence, or a short list of English words. You choose a few pictures that make the meaning obvious at a glance.
 
 OUTPUT: JSON Lines only. One JSON object per line. No prose, no markdown, no code fences. The screen draws each line the moment it arrives, so write the most important picture first and keep lines short.
 
 Line types:
-{"t":"scene","title":"<the idea in at most 7 simple English words>","title_ta":"<same idea in simple Tamil script>"}
-{"t":"group","layout":"compare|sequence|grid|single","label":"<2-5 words or empty>","label_ta":"<Tamil or empty>"}
-{"t":"panel","kind":"photo|illustration|video|symbol","wiki":"<exact English Wikipedia title or empty>","query":"<2-5 word English image search>","caption":"<1-3 English words>","caption_ta":"<Tamil>","badge":"yes|no|","mark":"<visible part to point at, or empty>","symbol":"<1-3 emoji showing the same thing>"}
+{"t":"scene","title":"<the idea in at most 7 simple English words>"}
+{"t":"group","layout":"compare|sequence|grid|single","label":"<2-5 words or empty>"}
+{"t":"panel","kind":"photo|illustration|video|symbol","wiki":"<exact English Wikipedia title or empty>","query":"<2-5 word English image search>","caption":"<1-3 English words>","badge":"yes|no|","mark":"<visible part to point at, or empty>","symbol":"<1-3 emoji showing the same thing>"}
 
 RULES
 - Line 1 is the scene line. Then 1 to 3 groups, each followed by its panels. At most 8 panels in total. Fewer is better when the sentence is simple.
@@ -390,31 +410,40 @@ RULES
 - wiki: only for an animal, plant species, food, object or place whose Wikipedia lead image is a clear photo of it (e.g. "Elephant", "Nelumbo nucifera", "Volcano"). Otherwise "".
 - query: concrete, visual, child-safe search words. For illustration include the word "cartoon". Do not include words like "picture of".
 - mark: when the sentence names a part (branch, leaf, root, trunk, stem, petal, beak, fin, wing, tail, wheel), set mark to that part on the panel where it is clearly visible, so the screen can point at it.
-- Captions use words a 5-year-old knows. Tamil in Tamil script, simple spoken Tamil.
+- Captions use words a 5-year-old knows. English only.
+- WORD LIST: when the input is a list of words (e.g. "Brown, bridge, brush" while teaching phonics or spelling), make ONE grid group with no label and ONE panel per word, in the same order. The caption is exactly that word, with a capital first letter. Pick the picture a child would recognise for that word (for a colour, a plain object of that colour; for an action, a child doing it). Use a sequence of groups of up to 4 words if there are more than 4 words.
 - Always fill symbol; it is shown while the photo loads.
 - Never show anything scary, violent, gory or medical. Sick means a child resting in bed or coughing, never a hospital, needle or blood.
 
 EXAMPLE
 Sentence: Coconut trees don't have branches
-{"t":"scene","title":"Coconut tree has no branches","title_ta":"தென்னை மரத்தில் கிளைகள் இல்லை"}
-{"t":"group","layout":"compare","label":"No branches, branches","label_ta":"கிளை இல்லை, கிளை உண்டு"}
-{"t":"panel","kind":"photo","wiki":"","query":"coconut palm tree","caption":"Coconut tree","caption_ta":"தென்னை மரம்","badge":"no","mark":"","symbol":"🌴"}
-{"t":"panel","kind":"photo","wiki":"","query":"mango tree branches","caption":"Mango tree","caption_ta":"மாமரம்","badge":"yes","mark":"branch","symbol":"🌳"}
+{"t":"scene","title":"Coconut tree has no branches"}
+{"t":"group","layout":"compare","label":"No branches, branches"}
+{"t":"panel","kind":"photo","wiki":"","query":"coconut palm tree","caption":"Coconut tree","badge":"no","mark":"","symbol":"🌴"}
+{"t":"panel","kind":"photo","wiki":"","query":"mango tree branches","caption":"Mango tree","badge":"yes","mark":"branch","symbol":"🌳"}
 
 EXAMPLE
 Sentence: Smoke, dust and germs pollute the air
-{"t":"scene","title":"Smoke, dust and germs make air dirty","title_ta":"புகை, தூசி, கிருமிகள் காற்றை அசுத்தமாக்கும்"}
-{"t":"group","layout":"grid","label":"These make air dirty","label_ta":"இவை காற்றை அசுத்தமாக்கும்"}
-{"t":"panel","kind":"photo","wiki":"","query":"factory chimney smoke","caption":"Smoke","caption_ta":"புகை","badge":"","mark":"","symbol":"🏭💨"}
-{"t":"panel","kind":"photo","wiki":"","query":"dust cloud dirt road","caption":"Dust","caption_ta":"தூசி","badge":"","mark":"","symbol":"🌫️"}
-{"t":"panel","kind":"illustration","wiki":"","query":"germs bacteria cartoon","caption":"Germs","caption_ta":"கிருமிகள்","badge":"","mark":"","symbol":"🦠"}
-{"t":"group","layout":"compare","label":"Clean air, dirty air","label_ta":"சுத்தமான காற்று, அசுத்தமான காற்று"}
-{"t":"panel","kind":"photo","wiki":"","query":"clean air blue sky park","caption":"Clean air","caption_ta":"சுத்தமான காற்று","badge":"yes","mark":"","symbol":"🌳☀️"}
-{"t":"panel","kind":"photo","wiki":"","query":"smog air pollution city","caption":"Dirty air","caption_ta":"அசுத்தமான காற்று","badge":"no","mark":"","symbol":"🏭🌫️"}
-{"t":"group","layout":"sequence","label":"Dirty air makes us sick","label_ta":"அசுத்தமான காற்று நோய் தரும்"}
-{"t":"panel","kind":"illustration","wiki":"","query":"boy breathing smoke cartoon","caption":"Breathes dirty air","caption_ta":"அசுத்த காற்றை சுவாசிக்கிறான்","badge":"","mark":"","symbol":"👦🌫️"}
-{"t":"panel","kind":"illustration","wiki":"","query":"boy coughing cartoon","caption":"Coughs","caption_ta":"இருமுகிறான்","badge":"","mark":"","symbol":"😷"}
-{"t":"panel","kind":"illustration","wiki":"","query":"sick child resting in bed cartoon","caption":"Feels sick","caption_ta":"உடம்பு சரியில்லை","badge":"","mark":"","symbol":"🤒🛏️"}`;
+{"t":"scene","title":"Smoke, dust and germs make air dirty"}
+{"t":"group","layout":"grid","label":"These make air dirty"}
+{"t":"panel","kind":"photo","wiki":"","query":"factory chimney smoke","caption":"Smoke","badge":"","mark":"","symbol":"🏭💨"}
+{"t":"panel","kind":"photo","wiki":"","query":"dust cloud dirt road","caption":"Dust","badge":"","mark":"","symbol":"🌫️"}
+{"t":"panel","kind":"illustration","wiki":"","query":"germs bacteria cartoon","caption":"Germs","badge":"","mark":"","symbol":"🦠"}
+{"t":"group","layout":"compare","label":"Clean air, dirty air"}
+{"t":"panel","kind":"photo","wiki":"","query":"clean air blue sky park","caption":"Clean air","badge":"yes","mark":"","symbol":"🌳☀️"}
+{"t":"panel","kind":"photo","wiki":"","query":"smog air pollution city","caption":"Dirty air","badge":"no","mark":"","symbol":"🏭🌫️"}
+{"t":"group","layout":"sequence","label":"Dirty air makes us sick"}
+{"t":"panel","kind":"illustration","wiki":"","query":"boy breathing smoke cartoon","caption":"Breathes dirty air","badge":"","mark":"","symbol":"👦🌫️"}
+{"t":"panel","kind":"illustration","wiki":"","query":"boy coughing cartoon","caption":"Coughs","badge":"","mark":"","symbol":"😷"}
+{"t":"panel","kind":"illustration","wiki":"","query":"sick child resting in bed cartoon","caption":"Feels sick","badge":"","mark":"","symbol":"🤒🛏️"}
+
+EXAMPLE
+Sentence: Brown, bridge, brush
+{"t":"scene","title":"Brown, bridge, brush"}
+{"t":"group","layout":"grid","label":""}
+{"t":"panel","kind":"photo","wiki":"","query":"brown teddy bear","caption":"Brown","badge":"","mark":"","symbol":"🟤"}
+{"t":"panel","kind":"photo","wiki":"","query":"bridge over river","caption":"Bridge","badge":"","mark":"","symbol":"🌉"}
+{"t":"panel","kind":"photo","wiki":"","query":"hair brush","caption":"Brush","badge":"","mark":"","symbol":"🪮"}`;
 
 /* ======================= small utils ======================= */
 const enc = encodeURIComponent;
@@ -648,6 +677,7 @@ function findCached(sentence){
 /* ======================= rendering ======================= */
 const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const ICON_CROSS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const ICON_SPEAK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z" fill="currentColor"/><path d="M15.5 8.8a4.5 4.5 0 0 1 0 6.4M18.3 6a8.5 8.5 0 0 1 0 12"/></svg>';
 const ICON_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg>';
 
 let current = null;         // scene on screen
@@ -660,7 +690,17 @@ function mountScene(scene){
   const host = $('sceneHost'); host.textContent = '';
   const sec = el('section', 'scene');
   const head = el('header', 'scene-head');
-  scene.$title = el('h1', 'scene-title'); scene.$titleTa = el('p', 'scene-title-ta'); scene.$titleTa.lang = 'ta';
+  scene.$title = el('h1', 'scene-title'); scene.$titleTa = el('p', 'scene-title-ta');
+  scene.$titleText = el('span'); scene.$title.append(scene.$titleText);
+  const tsay = el('button', 'say inline'); tsay.type = 'button'; tsay.innerHTML = ICON_SPEAK; tsay.setAttribute('aria-label', 'Say the title'); tsay.title = 'Say it';
+  tsay.onclick = () => {
+    const panels = scene.groups.flatMap(g => g.panels).filter(p => p.caption && p.$fig);
+    const title = norm(scene.$titleText.textContent);
+    const isList = panels.length > 1 && panels.every(p => title.includes(norm(p.caption)));
+    if(isList) speakSeq(panels.map(p => ({text:p.caption, btn:p.$say, fig:p.$fig})), tsay);
+    else speak(scene.$titleText.textContent, tsay);
+  };
+  scene.$title.append(tsay);
   head.append(scene.$title, scene.$titleTa);
   scene.$groups = el('div', 'groups');
   scene.$stepper = el('nav', 'stepper'); scene.$stepper.hidden = true;
@@ -670,13 +710,13 @@ function mountScene(scene){
 }
 function setTitle(scene){
   const t = scene.title || scene.sentence;
-  scene.$title.textContent = S.caption === 'ta' ? (scene.title_ta || t) : t;
-  scene.$titleTa.textContent = S.caption === 'both' ? (scene.title_ta || '') : '';
+  scene.$titleText.textContent = t;
+  scene.$titleTa.textContent = '';
   scene.$titleTa.hidden = !scene.$titleTa.textContent;
 }
 function addGroup(scene, g){
   g.$ = el('div', 'group'); g.$.dataset.layout = g.layout || 'grid';
-  const lbl = S.caption === 'ta' ? (g.label_ta || g.label) : g.label;
+  const lbl = g.label;
   if(lbl){ const l = el('p', 'group-label', lbl); g.$.append(l); }
   g.$row = el('div', 'row'); g.$.append(g.$row);
   scene.$groups.append(g.$);
@@ -716,11 +756,17 @@ function addPanel(scene, g, p){
   frame.append(sym);
   if(p.badge === 'yes' || p.badge === 'no'){ const b = el('div', 'badge ' + p.badge); b.innerHTML = p.badge === 'yes' ? ICON_CHECK : ICON_CROSS; frame.append(b); }
   fig.append(frame);
-  const cap = S.caption === 'ta' ? (p.caption_ta || p.caption) : p.caption;
-  if(cap) fig.append(el('figcaption', 'cap', cap));
-  if(S.caption === 'both' && p.caption_ta){ const t = el('div', 'cap-ta', p.caption_ta); t.lang = 'ta'; fig.append(t); }
+  const word = p.caption || '';
+  if(word){
+    const say = el('button', 'say'); say.type = 'button'; say.innerHTML = ICON_SPEAK; say.setAttribute('aria-label', 'Say “' + word + '”'); say.title = 'Say “' + word + '”';
+    say.addEventListener('click', e => { e.stopPropagation(); speak(word, say, fig); });
+    say.addEventListener('keydown', e => e.stopPropagation());
+    frame.append(say);
+    const cap = el('figcaption', 'cap', word); cap.title = 'Tap to hear'; cap.addEventListener('click', () => speak(word, say, fig));
+    fig.append(cap);
+  }
   g.$row.append(fig);
-  p.$frame = frame; p.$fig = fig;
+  p.$frame = frame; p.$fig = fig; p.$say = fig.querySelector('.say');
   frame.addEventListener('click', () => swapPicture(scene, p));
   frame.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); swapPicture(scene, p); } });
   new ResizeObserver(() => drawMark(p)).observe(frame);
@@ -948,6 +994,63 @@ function stopListening(){
 async function keepAwake(){ try{ if('wakeLock' in navigator && document.visibilityState === 'visible') wakeLock = await navigator.wakeLock.request('screen'); }catch{} }
 document.addEventListener('visibilitychange', () => { if(listening && document.visibilityState === 'visible') keepAwake(); });
 
+/* ======================= saying words aloud ======================= */
+const TTS = window.speechSynthesis;
+const GOOD_UK = /(sonia|libby|maisie|ryan|thomas|natural|online|google uk english|serena|kate|daniel|martha|arthur|stephanie|hazel|george|susan)/i;
+function englishVoices(){
+  if(!TTS) return [];
+  const v = TTS.getVoices().filter(x => /^en[-_]/i.test(x.lang));
+  const score = x => (/^en[-_]GB/i.test(x.lang) ? 0 : 10) + (GOOD_UK.test(x.name) ? 0 : 3) + (/natural|online/i.test(x.name) ? -1 : 0);
+  return v.sort((a, b) => score(a) - score(b) || a.name.localeCompare(b.name));
+}
+function pickVoice(){ const v = englishVoices(); return (S.voice && v.find(x => x.voiceURI === S.voice)) || v[0] || null; }
+let seqId = 0;
+function clearEmphasis(){ document.querySelectorAll('.talking,.speaking').forEach(x => x.classList.remove('talking', 'speaking')); }
+/* Says one word or phrase. While it is being said, its button lights up and its picture's caption zooms. */
+function utter(text, btn, fig){
+  return new Promise(resolve => {
+    const u = new SpeechSynthesisUtterance(text);
+    const v = pickVoice(); if(v){ u.voice = v; u.lang = v.lang; } else u.lang = 'en-GB';
+    u.rate = parseFloat(S.rate) || 0.85; u.pitch = 1;
+    let done = false;
+    const finish = () => {
+      if(done) return; done = true; clearTimeout(guard);
+      setTimeout(() => { if(btn) btn.classList.remove('talking'); if(fig) fig.classList.remove('speaking'); resolve(); }, 250);
+    };
+    /* some browsers never fire onend: release after a generous estimate */
+    const guard = setTimeout(finish, 1500 + text.length * 180 / u.rate);
+    if(btn) btn.classList.add('talking'); if(fig) fig.classList.add('speaking');
+    u.onend = u.onerror = finish;
+    TTS.speak(u);
+  });
+}
+function speak(text, btn, fig){
+  text = (text || '').trim(); if(!text) return;
+  if(!TTS){ log('This browser cannot speak words aloud.', 'err'); return; }
+  seqId++; TTS.cancel(); clearEmphasis();
+  utter(text, btn, fig);
+}
+async function speakSeq(items, titleBtn){
+  if(!TTS){ log('This browser cannot speak words aloud.', 'err'); return; }
+  const id = ++seqId; TTS.cancel(); clearEmphasis();
+  if(titleBtn) titleBtn.classList.add('talking');
+  for(const it of items){
+    if(id !== seqId) return;
+    await utter(it.text, it.btn, it.fig);
+    if(id !== seqId) return;
+    await sleep(350);
+  }
+  if(titleBtn) titleBtn.classList.remove('talking');
+}
+function fillVoices(){
+  const sel = $('s-voice'); if(!sel) return; const cur = S.voice; sel.textContent = '';
+  const v = englishVoices();
+  if(!v.length){ const o = el('option', null, 'Default voice'); o.value = ''; sel.append(o); return; }
+  v.forEach((x, i) => { const o = el('option', null, x.name.replace(/^Microsoft /, '') + ' (' + x.lang + ')' + (i === 0 ? ' · recommended' : '')); o.value = x.voiceURI; sel.append(o); });
+  sel.value = v.some(x => x.voiceURI === cur) ? cur : v[0].voiceURI;
+}
+if(TTS){ TTS.getVoices(); TTS.addEventListener ? TTS.addEventListener('voiceschanged', fillVoices) : (TTS.onvoiceschanged = fillVoices); }
+
 /* ======================= status ======================= */
 function setStatus(s, text){ $('status').dataset.s = s; $('statusText').textContent = text; }
 function setListeningStatus(){ if(listening) setStatus('listening', 'Listening for “' + (S.wake.split(',')[0] || '').trim() + '”'); else setStatus('off', 'Not listening'); }
@@ -958,7 +1061,7 @@ function showHeard(text, final, woke){
 }
 
 /* ======================= welcome ======================= */
-const EXAMPLES = ["Coconut trees don't have branches", 'Smoke, dust and germs pollute the air', 'A seed grows into a plant', 'Fish live in water, birds fly in the sky', 'Roots hold the plant in the soil'];
+const EXAMPLES = ["Coconut trees don't have branches", 'Smoke, dust and germs pollute the air', 'A seed grows into a plant', 'Fish live in water, birds fly in the sky', 'Roots hold the plant in the soil', 'Brown, bridge, brush'];
 function renderWelcome(){
   const w = (S.wake.split(',')[0] || 'buddy').trim();
   $('wakeShow').textContent = '“' + w.charAt(0).toUpperCase() + w.slice(1) + '”';
@@ -977,8 +1080,9 @@ function renderWelcome(){
 
 /* ======================= settings ======================= */
 const FIELDS = {provider:'s-provider', gkey:'s-gkey', gmodel:'s-gmodel', ckey:'s-ckey', cmodel:'s-cmodel', wake:'s-wake', lang:'s-lang', early:'s-early',
-                caption:'s-caption', pixabay:'s-pixabay', youtube:'s-youtube', marks:'s-marks', step:'s-step', lesson:'s-lesson'};
+                voice:'s-voice', rate:'s-rate', pixabay:'s-pixabay', youtube:'s-youtube', marks:'s-marks', step:'s-step', lesson:'s-lesson'};
 function openSettings(){
+  fillVoices();
   for(const k in FIELDS){ const f = $(FIELDS[k]); if(f.type === 'checkbox') f.checked = !!S[k]; else f.value = S[k]; }
   $('settings').showModal();
 }
@@ -987,6 +1091,7 @@ function readSettings(){
   for(const k in FIELDS){ const f = $(FIELDS[k]); S[k] = f.type === 'checkbox' ? f.checked : f.value.trim(); }
   if(!S.gmodel) S.gmodel = DEFAULTS.gmodel; if(!S.cmodel) S.cmodel = DEFAULTS.cmodel; if(!S.wake) S.wake = DEFAULTS.wake;
   store('sas.settings', S);
+  if(S.lang === 'ta-IN') S.lang = 'en-IN';
   if(listening && prevLang !== S.lang){ stopListening(); startListening(); }
   renderWelcome(); if(current) layoutGroups(current);
 }
@@ -1064,6 +1169,7 @@ async function testSetup(){
   $('testBtn').disabled = false;
 }
 $('testBtn').onclick = testSetup;
+$('voiceTest').onclick = () => { const keep = [S.voice, S.rate]; S.voice = $('s-voice').value; S.rate = $('s-rate').value; speak('Brown. Bridge. Brush.', $('voiceTest')); [S.voice, S.rate] = keep; };
 function showGuide(lang){
   const ta = lang === 'ta';
   $('gEn').hidden = ta; $('gTa').hidden = !ta;
